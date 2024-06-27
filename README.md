@@ -6,7 +6,15 @@
 
 ---
 
-### Dependencies:
+### TLDR: config and run all at once:
+
+To 1) configure the database, 2) install the `npm` dependencies, and 3) execute the server, run:
+```bash
+make all
+```
+
+
+### Dependencies
 
 - Docker & docker-compose
 - nodejs & npm
@@ -18,7 +26,7 @@ make install
 ```
 
 
-### Database:
+### Database
 
 1. Create an `.env` file in the root of the project and insert the following variables:
    ```shell
