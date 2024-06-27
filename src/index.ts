@@ -1,4 +1,22 @@
-let id: number = 5;
+import { PrismaClient } from "@prisma/client";
 
-let ids: number[] = [12, 3, 3,4];
+const prisma = new PrismaClient();
 
+async function main() {
+    // Create a user
+    const user = await prisma.user.create({
+        data: {
+            name: "John",
+        }
+    });
+
+    console.log(user);
+}
+
+main()
+    .then(async () => await prisma.$disconnect())
+    .catch(async (e) => {
+        console.error(e);
+        await prisma.$disconnect();
+        process.exit(1);
+    });
