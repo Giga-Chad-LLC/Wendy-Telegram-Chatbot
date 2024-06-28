@@ -33,6 +33,7 @@ make install
    
    # user for Telegram API
    BOT_TOKEN=1234567:AAAAAA-BBBBBBBBBBB-CCCCCCCCCCCC
+   OPENAI_API_KEY=sdf_fds-fsdasdfasdfasdfsnfsdfsdfadf
    ```
 
 2. To boot up the postgres database in a docker run:

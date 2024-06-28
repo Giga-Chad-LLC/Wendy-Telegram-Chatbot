@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "run": "npx ts-node ./src/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -12,18 +13,19 @@
   "description": "",
   "devDependencies": {
     "@types/node": "^20.14.9",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.5.2",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "copy-webpack-plugin": "^12.0.2",
     "dotenv": "^16.3.1",
     "eslint": "^8.42.0",
     "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-prettier": "^5.0.0"
+    "eslint-plugin-prettier": "^5.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.2"
   },
   "dependencies": {
     "@prisma/client": "^5.16.1",
+    "openai": "^4.52.1",
     "prisma": "^5.16.1",
     "telegraf": "^4.16.3"
   }
