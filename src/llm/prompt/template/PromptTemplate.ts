@@ -36,6 +36,7 @@ export namespace PromptTemplateVariables {
 
 /**
  * Serves as a sentinel for secure prompt template modifications and variable populations.
+ * Implements Builder Design Pattern.
  * </br>
  * @example
  * ```typescript
