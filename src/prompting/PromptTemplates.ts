@@ -1,48 +1,48 @@
 
 export const promptTemplates = {
-  buildExampleConversationPrompt: `
+  buildExampleConversationPromptTemplate: `
 ### Your Persona:
-{{Persona}}
+{{PERSONA_DESCRIPTION}}
 
 
 ### Instruction:
-{{Instruction}}
+{{INSTRUCTION}}
 
 ### About conversation partner: 
-You are talking with a person named {{UserName}}. Here is her summary:
-{{Questionnaire}}
+You are talking with a person named {{USER_NAME}}. Here is her summary:
+{{QUESTIONNAIRE}}
 
 ### Output Format:
-{{OutputFormat}}`,
+{{OUTPUT_FORMAT}}`,
 
-  coldConversationStartInstructionPrompt: `
+  coldConversationStartInstructionPromptTemplate: `
 ### Your Persona:
-{{Persona}}
+{{PERSONA_DESCRIPTION}}
 
 
 ### Instruction:
-{{Instruction}}
+{{INSTRUCTION}}
 
 
 ### About conversation partner: 
-You are talking with a person named {{Name}}. Here is her summary:
-{{Questionnaire}}
+You are talking with a person named {{USER_NAME}}. Here is her summary:
+{{QUESTIONNAIRE}}
 
 
 ### Example:
-Here is an example of possible conversation between Wendy and {{Name}}. Use it ONLY as an example of how you should behave:
-{{ConversationExample}}
+Here is an example of possible conversation between {{PERSONA_NAME}} and {{USER_NAME}}. Use it ONLY as an example of how you should behave:
+{{CONVERSATION_EXAMPLE}}
 
 
-### Last message of {{UserName}}:
-{{ChatMessage}}
+### Last message of {{USER_NAME}}:
+{{CHAT_MESSAGE}}
 
 
 From now on, you respond ONLY with character's persona messages.`,
 
-  dialogInitializationInstructionPrompt: `
+  dialogInitializationInstructionPromptTemplate: `
 ### Your Persona:
-{{Persona}}
+{{PERSONA_DESCRIPTION}}
 ${1/* TODO: finalize prompt! */}
 `
 };
