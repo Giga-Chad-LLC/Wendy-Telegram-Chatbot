@@ -1,0 +1,58 @@
+title **Notification Setup (Simplified: Single Daily Notification)**
+
+participant Client
+participant Bot
+participant Database
+
+Client->Bot:Sends **/notifications**
+Client<--Bot:Shows 3 Telegram buttons:\n**Cancel**, **Set** (if none exists for user) OR **Modify** (if one exists already) OR\n**Delete** (if one exists), **Show** (shows current notification if any)
+
+Bot->Database: **TODO:** do we need to make notification setup stateful?
+
+// Cancel
+group #2f2e7b Cancel #white [Notification Setup Action: Cancel button pressed]
+  box over Client,Bot:**Abort** notification setup
+end
+
+// Modify
+group #2f2e7b Modify #white [Notification Setup Action: Modify button pressed]
+  Client->Bot:Presses **Modify** button
+  Client<--Bot: Sends saved timezone (based on the country) & asks whether it is correct:\nTelegram buttons **Yes** and **No**, **Cancel**.
+  
+  note over Client,Bot:All clicks on **Cancel** omitted for clarity assuming that the notification setup aborts. 
+  
+  group #2f8e7b No #white [Timezone change: No button pressed]
+    Client->Bot:Presses **No** button
+    Client<--Bot: Shows buttons with all possible timezone (UTC-based) & **Cancel** button.
+    Client->Bot:Selects desired timezone
+
+    Bot->Database:Updates User's timezone
+    note over Bot, Database:If DB request fails, abort **Notification Setup** & notify user to restart it.
+    Bot<--Database:Update succeeds
+    Client<--Bot:Acknowledges that timezone successfully changed.
+  end
+  
+  group #2f8e7b Yes #white [Timezone change: Yes button pressed]
+    note over Client,Bot: No-op
+  end
+  
+  Client<-Bot: Sends message with the current time & shows buttons with time\n(30-min-based timepoints around the clock) & **Have current time** button
+  note over Client,Bot: if **Have current time** selected, then **No-op**
+  Client-->Bot:Selects a timepoint
+  Bot->Database:Updates timepoint of user's recurring chat notification.
+  Bot->Bot:Schedules notification according to time parameters,\nand sends a recurring Job for the notification.
+  Client<-Bot:Acknowledges that **recurring notification** is set up and will fire in N mins/hours,\nreminds that the notification settings can be changed by running **/notification** command 
+  
+end
+
+# Set
+group #2f2e7b Set #white [Notification Setup Action: Set button pressed]
+  box over Client,Bot:Follow the same steps as above: 1) ask for timezone; 2) request timepoint;\n3) Acknowledge that the notification is set.
+end
+
+# Delete
+group #2f2e7b Delete #white [Notification Setup Action: Delete button pressed]
+  Client->Bot:Pressed **Delete** button
+  Bot->Database:Deletes the reccuring notification entry
+  Client<-Bot:Acknoledges notification was deleted
+end

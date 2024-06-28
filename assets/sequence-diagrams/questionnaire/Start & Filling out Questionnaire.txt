@@ -1,0 +1,81 @@
+title **Start & Filling out Questionnaire**
+
+participant Client
+participant Bot
+participant Database
+
+Client->Bot:Sends **/start**
+Bot->Database:**Checks user existence [condition]**
+// User exists
+group #2f2e7b Exists #white [User exists]
+  Client<--Bot:Says that user is known. If user wants to modify questionnaire send **/get-to-know**
+end
+
+group #2f2e7b Not found #white [User not found]
+  Bot->Database:Creates a user record in database: inserts\n**User** & **QuestionnaireInProgress** with the 1st state of **PreferredName**.
+
+  Bot->Client:Greets & asks to start filling out the Questionnaire by sending **/get-to-know**
+end
+
+
+Client->Bot:Sends **/get-to-know**
+Client<--Bot:Shows Telegram button: **Modify** (if filled questionnaire already exists) OR **Fill out** (if no questionnaire found). 
+
+
+# Modify Questionnaire
+group #2f2e7b Modify #white [Questionnaire Action: Modify button pressed]
+  Client->Bot: Presses **Modify** button.
+  Client<--Bot: Shows buttons of items to modify: **PreferredName**, **IsAdult**, **Age**, **ResidenceCountry**, **ResidenceCity**, **Bio**.
+  Client->Bot:Selects one of the options
+  Client<--Bot:Asks to write a message with to which value the field should be updated & Show **Cancel** button
+  box over Client,Bot: if user cancels then abort modificaiton and return to normal chat
+  Client->Bot:Sends message with the context that will be set as field value
+  Bot->Bot:Validates the message context 
+  Bot->Database:Updates the field's value
+  Client<--Bot:Acknowledges that the field updated
+  box over Client,Bot:Chat returns to normal state, user messages are now forwarded to LLM.
+end
+
+
+
+# Fill out Questionnaire
+group #2f2e7b Fill out #white [Questionnaire Action: Fill out button pressed]
+
+  note left of Bot: The Questionnaire filling out process is stateful, thus it should be split into segments by **Questionnaire items**.\nUser cannot continue to use the bot until he **fills out the Questionnaire completely**. Here is the workflow for\na single item.
+
+  Bot->Bot:Enter Questionnaire filling out state: **PreferredName**
+  
+  Client<--Bot: Asks user to write **PreferredName** as a message.
+  Client->Bot:Writes the message with **PreferredName**
+  Bot->Bot:**Validates the message\n(e.g., age is in range 5 to 110) [condition]**
+  
+  group #2f8e7b Invalid Message #white [Validation of the message failed]
+  Client<--Bot:Tells that validation failed & re-prompts user to write the value again
+  end
+
+  group #2f8e7b Valid Message #white [Validation succeeds]
+    Bot->Database: Writes value to the current field
+    Client<--Bot:Acknowledges successful value setting
+    Bot->Bot:**Checks whether any other fields left unset [condition]**
+  
+    group #2f8e20 #while [Has another unset questionnaire field]
+      Bot->Bot:Changes state to the next unset field
+      Client<--Bot:Asks user to write **NextField** as a message (recurses to the beginning of the **Fill out** branch.
+    end
+    
+    group #2f8e20 #while [No unset questionnaire fields left]
+      Bot->Database:Creates a full questionnaire for the user
+      Client<--Bot:Acknowledges that the questionnaire created. 
+      box over Client,Bot:Once Questionnaire created, the bot **enters the normal message-based communication state**.
+      
+      
+      box over Client,Bot:Next, see the **"First LLM Interaction"** diagram.
+    end
+  end
+
+end
+
+
+
+
+

@@ -1,0 +1,30 @@
+title **First LLM Interaction**
+
+
+
+participant Client
+participant Bot
+participant LLM
+participant Database
+
+box over Bot,LLM:LLM interaction starts only after the Questionnaire is **fully filled out**.\nThis is the **first interaction message** sent within a chat.\nUse **few-short** prompting to enrich the first interaction, as it lacks history.
+
+Bot->LLM:Sends questionnaire details, instructs LLM to follow **Wendy persona** and\nto generate example of first communication (it'll be used as **example** in\n**few-shot prompt** coming next).
+
+Bot<--LLM:Sends response with example conversation (it will be parsed & inserted\ninto the next prompt as example of huma-like interaction for LLM).
+
+Bot->Bot:Parse LLM response & craft **1st-interaction prompt**:\nQuestionnaire, Wendy persona, example conversation.
+
+Bot->LLM:Sends **1st-interaction prompt**
+
+Bot<--LLM:Responds with a message acting as Wendy persona\n(message should have a question-based format, so\nthat we get to know more about the user).
+
+# Create Dialog in DB
+Bot->Database:Creates **Dialog** associated with user
+
+Client<-Bot:Sends the generated message
+Client-->Bot:Responds to the message, protentially asnwering a question.
+
+box over Client,Bot: The general conversation between user & LLM starts now on.
+
+box over Client,Bot: Next, see **"General Interaction"** or **"Notification Setup (Simplified)"** diagrams.

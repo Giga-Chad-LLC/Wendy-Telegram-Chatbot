@@ -48,3 +48,10 @@ To start the server run:
 make run
 # runs: npx ts-node ./src/index.ts
 ```
+
+
+## Architecture:
+
+Navigate to this [README.md](./assets/sequence-diagrams/README.md).
+
+---

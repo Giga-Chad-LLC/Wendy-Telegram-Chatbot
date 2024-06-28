@@ -1,0 +1,19 @@
+title **General Interaction**
+
+participant Client
+participant Bot
+participant LLM
+participant Database
+
+
+Client->Bot:Sends new message
+
+Bot->Bot: Applies algorithm for insertion of new\nmessage into **Dialog (sliding window)**
+
+Bot-#red>Database: Saves message & Updates the user's **Dialog**
+
+Bot->LLM:Sends the prompts history crafted from **Dialog**
+Bot<--LLM:Generates & provides response to user's last message
+Client<--Bot:Transmits the LLM's response message
+
+box over Client,LLM: Here, in the future we can add different conversation analysis based on **Dialog's** content.\nE.g., **classify user's mood** and respond with **hotline phone numbers**, or start interactive\n**Beck Depression Inventory** or **Children Depression Inventory** surveys.
