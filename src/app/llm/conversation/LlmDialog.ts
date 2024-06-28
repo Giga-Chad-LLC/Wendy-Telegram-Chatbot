@@ -1,5 +1,5 @@
 import { LlmProvider } from '../providers/LlmProvider';
-import { Questionnaire } from '../../db/models/Questionnaire';
+import { Questionnaire } from '../../../db/models/Questionnaire';
 import { promptTemplates } from '../../prompting/PromptTemplates';
 import { PromptTemplate, PromptTemplateVariables } from '../prompt/template/PromptTemplate';
 import { Wendy } from '../prompt/configs/Personas';
@@ -8,7 +8,7 @@ import {
   converseWithPartnerAccordingToPersonaInstruction,
 } from '../prompt/configs/Instructions';
 import { LlmRegex } from '../../regex/llmRegex';
-import { ChatMessage } from '../../db/models/ChatMessage';
+import { ChatMessage } from '../../../db/models/ChatMessage';
 
 
 
@@ -20,8 +20,8 @@ export class LlmDialog {
   }
 
   async startColdConversationWithFewShotPrompting(
-    lastUserChatMessage: ChatMessage,
-    questionnaire: Questionnaire
+    lastUserChatMessage: string,
+    questionnaire: Questionnaire,
   ): Promise<string> {
     try {
       const conversationExample = await this.createAuxiliaryConversationExample(questionnaire);
@@ -34,7 +34,7 @@ export class LlmDialog {
         .set(PromptTemplateVariables.QUESTIONNAIRE, questionnaire.promptify())
         .set(PromptTemplateVariables.CONVERSATION_EXAMPLE, conversationExample)
         .set(PromptTemplateVariables.USER_NAME, questionnaire.dto.preferredName)
-        .set(PromptTemplateVariables.CHAT_MESSAGE, lastUserChatMessage.dto.text)
+        .set(PromptTemplateVariables.CHAT_MESSAGE, lastUserChatMessage)
         .build();
 
       // contains answer of persona that should be sent in user's chat

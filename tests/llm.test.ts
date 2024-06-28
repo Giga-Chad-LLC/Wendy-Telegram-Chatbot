@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { OpenAILlmProvider } from '../src/llm/providers/OpenAILlmProvider';
+import { OpenAILlmProvider } from '../src/app/llm/providers/OpenAILlmProvider';
 import { Questionnaire } from '../src/db/models/Questionnaire';
-import { LlmDialog } from '../src/llm/conversation/LlmDialog';
+import { LlmDialog } from '../src/app/llm/conversation/LlmDialog';
 import { ChatMessage, ChatMessageRole } from '../src/db/models/ChatMessage';
 
 
@@ -49,7 +49,7 @@ describe('OpenAILlmProvider', () => {
       }
     });
 
-    const response = await llmDialog.startColdConversationWithFewShotPrompting(lastUserChatMessage, questionnaire);
+    const response = await llmDialog.startColdConversationWithFewShotPrompting(lastUserChatMessage.dto.text, questionnaire);
 
     console.log(`=============== finalResponse ===============\n${response}`);
   }, -1);
