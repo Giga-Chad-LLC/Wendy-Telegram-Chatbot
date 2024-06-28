@@ -16,6 +16,8 @@
   },
   "dependencies": {
     "@prisma/client": "^5.16.1",
-    "prisma": "^5.16.1"
+    "dotenv": "^16.4.5",
+    "prisma": "^5.16.1",
+    "telegraf": "^4.16.3"
   }
 }
