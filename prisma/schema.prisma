@@ -16,5 +16,47 @@ datasource db {
 
 model User {
   id  Int @id @default(autoincrement())
-  name  String
+  telegramFirstName  String
+  telegramLastName  String
+  telegramUserId  String
+  telegramChatId  Int @unique
+  since DateTime @default(now())
+  questionnaire Questionnaire?
+  messages  ChatMessage[]
+  notifications RecurringChatNotification[]
+}
+
+model Questionnaire {
+  id  Int @id @default(autoincrement())
+  userId  Int @unique
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  preferredName String
+  bio String
+  age Int?
+  isAdult Boolean
+  residenceCountry  String
+  residenceCity String?
+}
+
+enum ChatMessageRole {
+  USER
+  ASSISTANT
+}
+
+model ChatMessage {
+  id  Int @id @default(autoincrement())
+  userId  Int @unique
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  summary String
+  text  String
+  role  ChatMessageRole
+  sent  DateTime @default(now()) @db.Timestamptz
+  lastEdited  DateTime @default(now()) @db.Timestamptz
+}
+
+model RecurringChatNotification {
+  id  Int @id @default(autoincrement())
+  userId  Int @unique
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dayTimepoint  Int // TODO: should it be DateTime?
 }
