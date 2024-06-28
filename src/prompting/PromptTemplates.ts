@@ -8,9 +8,11 @@ export const promptTemplates = {
 ### Instruction:
 {{INSTRUCTION}}
 
+
 ### About conversation partner: 
 You are talking with a person named {{USER_NAME}}. Here is her summary:
 {{QUESTIONNAIRE}}
+
 
 ### Output Format:
 {{OUTPUT_FORMAT}}`,
