@@ -4,18 +4,18 @@ export interface LlmProviderParams {
   model: string;
 }
 
-export enum Role {
+export enum LlmChatMessageRole {
   USER = "user",
   ASSISTANT = "assistant",
 }
 
-export type ChatMessage = {
-  role: Role,
+export type LlmChatMessage = {
+  role: LlmChatMessageRole,
   content: string
 }
 
 export interface LlmProvider {
   sendMessage(message: string): Promise<string>;
-  sendMessages(messages: ChatMessage[]): Promise<string>;
+  sendMessages(messages: LlmChatMessage[]): Promise<string>;
 }
 
