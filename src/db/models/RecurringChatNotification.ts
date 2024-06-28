@@ -1,18 +1,21 @@
 
-export type RecurringChatNotificationParams = {
-  id: number;
+
+export type RecurringChatNotificationDto = {
   userId: number;
   dayTimepoint: number;
 }
 
+export type RecurringChatNotificationParams = {
+  id: number;
+  dto: RecurringChatNotificationDto;
+}
+
 export class RecurringChatNotification {
   readonly id: number;
-  readonly userId: number;
-  readonly dayTimepoint: number;
+  readonly dto: RecurringChatNotificationDto;
 
-  constructor({ id, userId, dayTimepoint }: RecurringChatNotificationParams) {
+  constructor({ id, dto }: RecurringChatNotificationParams) {
     this.id = id;
-    this.userId = userId;
-    this.dayTimepoint = dayTimepoint;
+    this.dto = dto;
   }
 }
