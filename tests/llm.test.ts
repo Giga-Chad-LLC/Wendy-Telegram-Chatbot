@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { OpenAILlmProvider } from '../src/llm/providers/OpenAILlmProvider';
-import { Questionnaire } from '../src/model/data/Questionnaire';
+import { Questionnaire } from '../src/db/models/Questionnaire';
 import { LlmDialog } from '../src/llm/conversation/LlmDialog';
-import { ChatMessage, ChatMessageDto } from '../src/model/data/ChatMessage';
+import { ChatMessage, ChatMessageDto } from '../src/db/models/ChatMessage';
 
 
 

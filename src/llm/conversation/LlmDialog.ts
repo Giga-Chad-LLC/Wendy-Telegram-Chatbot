@@ -1,5 +1,5 @@
 import { LlmProvider } from '../providers/LlmProvider';
-import { Questionnaire } from '../../model/data/Questionnaire';
+import { Questionnaire } from '../../db/models/Questionnaire';
 import { promptTemplates } from '../../prompting/PromptTemplates';
 import { PromptTemplate, PromptTemplateVariables } from '../prompt/template/PromptTemplate';
 import { Wendy } from '../prompt/configs/Personas';
@@ -8,7 +8,7 @@ import {
   converseWithPartnerAccordingToPersonaInstruction,
 } from '../prompt/configs/Instructions';
 import { LlmRegex } from '../../regex/llmRegex';
-import { ChatMessage } from '../../model/data/ChatMessage';
+import { ChatMessage } from '../../db/models/ChatMessage';
 
 
 

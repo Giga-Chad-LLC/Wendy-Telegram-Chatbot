@@ -1,22 +1,29 @@
 
-
 export type QuestionnaireDto = {
   readonly preferredName: string;
   readonly isAdult: boolean;
-  readonly age?: number;
+  readonly age: number | null;
   readonly residenceCountry: string;
-  readonly residenceCity?: string;
+  readonly residenceCity: string | null;
   readonly bio: string;
 }
 
-
 export class Questionnaire {
-  dto: QuestionnaireDto
+  readonly id: number;
+  readonly userId: number;
+  dto: QuestionnaireDto;
 
-  constructor(dto: QuestionnaireDto) {
+  constructor(id: number, userId: number, dto: QuestionnaireDto) {
+    this.id = id;
+    this.userId = userId;
     this.dto = dto;
   }
 
+  /**
+   * Creates a string summary of the `Questionnaire` suitable to be inserted into the prompt.
+   *
+   * @return formatted string representation of the questionnaire
+   */
   promptify(): string {
     return `Preferred Name: ${this.dto.preferredName}
       Maturity: ${this.dto.isAdult ? 'Adult' : 'Minor'}
