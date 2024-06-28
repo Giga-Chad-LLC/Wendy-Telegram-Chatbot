@@ -30,6 +30,9 @@ make install
    
    # used by Prisma
    DATABASE_URL="postgresql://user:pass@localhost:5432/db_name?schema=public"
+   
+   # user for Telegram API
+   BOT_TOKEN=1234567:AAAAAA-BBBBBBBBBBB-CCCCCCCCCCCC
    ```
 
 2. To boot up the postgres database in a docker run:
