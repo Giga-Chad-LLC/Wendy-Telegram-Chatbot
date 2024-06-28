@@ -12,12 +12,18 @@ export type ChatMessageDto = {
   readonly lastEdited: Date;
 }
 
+export type ChatMessageParams = {
+  id: number;
+  userId: number;
+  dto: ChatMessageDto;
+}
+
 export class ChatMessage {
   readonly id: number;
   readonly userId: number;
   readonly dto: ChatMessageDto;
 
-  constructor(id: number, userId: number, dto: ChatMessageDto) {
+  constructor({ id, userId, dto }: ChatMessageParams) {
     this.id = id;
     this.userId = userId;
     this.dto = dto;

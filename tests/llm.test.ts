@@ -1,9 +1,8 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { OpenAILlmProvider } from '../src/llm/providers/OpenAILlmProvider';
 import { Questionnaire } from '../src/db/models/Questionnaire';
 import { LlmDialog } from '../src/llm/conversation/LlmDialog';
-import { ChatMessage, ChatMessageDto } from '../src/db/models/ChatMessage';
-
+import { ChatMessage, ChatMessageRole } from '../src/db/models/ChatMessage';
 
 
 describe('OpenAILlmProvider', () => {
@@ -26,15 +25,30 @@ describe('OpenAILlmProvider', () => {
     const llmDialog = new LlmDialog(llmProvider);
 
     const questionnaire = new Questionnaire({
-      preferredName: 'Alphard',
-      isAdult: false,
-      age: 12,
-      residenceCountry: 'USA',
-      // residenceCity: undefined,
-      bio: 'Hello! I am Alphard. I am from USA. I love baseball and football. I have some struggles at school; I am being bullied by classmates. I want to overcome this and make them get off me.',
+      id: 1,
+      userId: 1,
+      dto: {
+        preferredName: 'Alphard',
+        isAdult: false,
+        age: 12,
+        residenceCountry: 'USA',
+        residenceCity: null,
+        bio: 'Hello! I am Alphard. I am from USA. I love baseball and football. I have some struggles at school; I am being bullied by classmates. I want to overcome this and make them get off me.',
+      },
     })
 
-    const lastUserChatMessage = new ChatMessage(new ChatMessageDto());
+    const lastUserChatMessage = new ChatMessage({
+      id: 1,
+      userId: 1,
+      dto: {
+        text: "Hello! Today I had a great day. I played football with my friends and hit 3 goals! Our team won over 2 goals!",
+        summary: "",
+        role: ChatMessageRole.USER,
+        sent: new Date(),
+        lastEdited: new Date(),
+      }
+    });
+
     const response = await llmDialog.startColdConversationWithFewShotPrompting(lastUserChatMessage, questionnaire);
 
     console.log(`=============== finalResponse ===============\n${response}`);

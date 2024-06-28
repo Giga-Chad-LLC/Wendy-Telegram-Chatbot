@@ -8,12 +8,18 @@ export type QuestionnaireDto = {
   readonly bio: string;
 }
 
+export type QuestionnaireParams = {
+  id: number;
+  userId: number;
+  dto: QuestionnaireDto;
+}
+
 export class Questionnaire {
   readonly id: number;
   readonly userId: number;
   dto: QuestionnaireDto;
 
-  constructor(id: number, userId: number, dto: QuestionnaireDto) {
+  constructor({ id, userId, dto }: QuestionnaireParams) {
     this.id = id;
     this.userId = userId;
     this.dto = dto;

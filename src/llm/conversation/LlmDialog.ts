@@ -34,8 +34,7 @@ export class LlmDialog {
         .set(PromptTemplateVariables.QUESTIONNAIRE, questionnaire.promptify())
         .set(PromptTemplateVariables.CONVERSATION_EXAMPLE, conversationExample)
         .set(PromptTemplateVariables.USER_NAME, questionnaire.dto.preferredName)
-        // TODO: use lastUserChatMessage for CHAT_MESSAGE
-        .set(PromptTemplateVariables.CHAT_MESSAGE, "Hello! Today I had a great day. I played football with my friends and hit 3 goals! Our team won over 2 goals!")
+        .set(PromptTemplateVariables.CHAT_MESSAGE, lastUserChatMessage.dto.text)
         .build();
 
       // contains answer of persona that should be sent in user's chat
