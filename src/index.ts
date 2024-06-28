@@ -10,14 +10,7 @@ dotenv.config();
 const prisma = new PrismaClient();
 
 async function main() {
-  // Create a user
-  const user = await prisma.user.create({
-    data: {
-      name: 'John',
-    },
-  });
 
-  console.log('User created:', user);
 }
 
 main()
