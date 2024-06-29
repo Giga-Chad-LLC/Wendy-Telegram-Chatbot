@@ -27,7 +27,7 @@ export type CreateGeneralDialogInstructionPromptParams = {
   questionnaire: QuestionnaireModel,
   messagesToSummarize: ChatMessageModel[],
   recentMessages: ChatMessageModel[],
-  lastUserMessage: ChatMessageModel,
+  lastUserMessage: string,
   persona: Persona,
 }
 
@@ -157,7 +157,7 @@ export class LlmDialogManager {
       .set(PromptTemplateVariables.QUESTIONNAIRE, questionnaire.promptify())
       .set(PromptTemplateVariables.SUMMARIZED_MESSAGES, summarizedMessagesComponent)
       .set(PromptTemplateVariables.CONVERSATION_MESSAGES, recentMessagesComponent)
-      .set(PromptTemplateVariables.LAST_CHAT_MESSAGE, lastUserMessage.dto.text)
+      .set(PromptTemplateVariables.LAST_CHAT_MESSAGE, lastUserMessage)
       .set(PromptTemplateVariables.USER_NAME, questionnaire.dto.preferredName)
       .build();
   }
