@@ -8,6 +8,8 @@ import { SystemLlmChatMessage, UserLlmChatMessage } from '../app/llm/providers/L
 import { QuestionnaireRepository } from '../db/repositories/QuestionnaireRepository';
 import { QuestionnaireModel } from '../db/models/QuestionnaireModel';
 import { Wendy } from '../app/llm/prompt/configs/Personas';
+import { ApplicationError } from '../app/errors/ApplicationError';
+import { sliceArrayInGroupsByK } from '../app/utils/CollectionsUtils';
 
 export type ConversationContinuationParams = {
   lastUserMessage: string;
@@ -35,7 +37,13 @@ export class LlmDialogController {
 
   async converse({ lastUserMessage, userId }: ConversationContinuationParams) {
     // retrieve data required for the system prompt
-    const questionnaire = (await this.questionnaireRepository.getUserById(userId))!;
+    const questionnaire = (await this.questionnaireRepository.getByUserId(userId));
+
+    // user has not filled out the questionnaire => no LLM interaction allowed
+    if (!questionnaire) {
+      throw new ApplicationError(`User with id ${userId} did not fill out the questionnaire`);
+    }
+
     // TODO: no hard-coding!
     const persona = new Wendy();
 
@@ -68,7 +76,7 @@ export class LlmDialogController {
     while (!sufficientHistoryCrafted) {
       let messages = await this.chatMessageRepository.getPaginatedSortedMessages({
         userId: userId,
-        field: "sent" as keyof ChatMessage, // newest messages first
+        field: "sent", // newest messages first
         ascending: true,
         page: page,
         limit: limit,
@@ -76,9 +84,12 @@ export class LlmDialogController {
 
       // check whether there are messages between user and assistant on current page
       if (messages.length > 0) {
-        const recentMessages = messages.slice(recentMessagesCount);
-        const messagesToSummarize = messages.slice(-summarizedMessagesCount);
+        const {
+          firstGroup: recentMessages,
+          secondGroup: messagesToSummarize,
+        } = sliceArrayInGroupsByK({ items: messages, firstGroupSize: recentMessagesCount });
 
+        // craft initial prompt for history
         const initialSystemPrompt = this.llmDialogManager.createGeneralDialogInstructionPrompt({
           questionnaire: new QuestionnaireModel(questionnaire),
           messagesToSummarize: messagesToSummarize.map(msg => new ChatMessageModel(msg)),
@@ -100,6 +111,7 @@ export class LlmDialogController {
           sufficientHistoryCrafted = true;
         }
 
+        // preparing to retrieve next page on next loop iteration
         page += 1;
       }
       else {
@@ -107,13 +119,15 @@ export class LlmDialogController {
       }
     }
 
-    console.log(`History Crafted: ${currentHistory}`)
-    console.log(`History's Initial System Prompt:\n"""${currentHistory.initialSystemPrompt}\n"""`)
-    console.log(`User's Last Message:\n"""${currentHistory.lastMessage}\n"""`)
+    console.log(`History Crafted: messages count: ${currentHistory.messages.length}`)
+    console.log(`History's Initial System Prompt:\n"""${currentHistory.initialSystemPrompt.content}\n"""`)
+    console.log(`User's Last Message:\n"""${currentHistory.lastMessage.content}\n"""`)
 
     // use current history to make conversation prompts
+    // TODO: we need only LLM response message, it'll be saved into DB, no need in entire history
     const updatedHistory = await this.llmDialogManager.converse({ history: currentHistory });
+
     // TODO(vartiukhov): [IMPORTANT] save LLM response from updatedHistory into database
-    console.log(`Last LLM Message: ${updatedHistory.lastMessage}`);
+    console.log(`Last LLM Message: ${updatedHistory.lastMessage.content}`);
   }
 }
