@@ -7,6 +7,7 @@ export enum ChatMessageModelRole {
 }
 
 export type ChatMessageModelDto = {
+  readonly userId: number;
   readonly text: string;
   readonly summary: string;
   readonly role: ChatMessageModelRole;
@@ -16,17 +17,16 @@ export type ChatMessageModelDto = {
 
 export class ChatMessageModel implements IPromptifiable {
   readonly id: number;
-  readonly userId: number;
   readonly dto: ChatMessageModelDto;
 
   constructor(chatMessage: ChatMessage) {
     this.id = chatMessage.id;
-    this.userId = chatMessage.userId;
 
     const role = (chatMessage.role == ChatMessageRole.USER)
         ? ChatMessageModelRole.USER : ChatMessageModelRole.ASSISTANT;
 
     this.dto = {
+      userId: chatMessage.userId,
       text: chatMessage.text,
       summary: chatMessage.summary,
       role: role,
