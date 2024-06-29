@@ -1,6 +1,7 @@
 import { IPromptifiable } from '../../app/actions/IPromptifiable';
+import { ChatMessage, ChatMessageRole } from '@prisma/client';
 
-export enum ChatMessageRole {
+export enum ChatMessageModelRole {
   USER = "user",
   ASSISTANT = "assistant",
 }
@@ -8,15 +9,9 @@ export enum ChatMessageRole {
 export type ChatMessageModelDto = {
   readonly text: string;
   readonly summary: string;
-  readonly role: ChatMessageRole;
+  readonly role: ChatMessageModelRole;
   readonly sent: Date;
   readonly lastEdited: Date;
-}
-
-export type ChatMessageModelParams = {
-  id: number;
-  userId: number;
-  dto: ChatMessageModelDto;
 }
 
 export class ChatMessageModel implements IPromptifiable {
@@ -24,10 +19,20 @@ export class ChatMessageModel implements IPromptifiable {
   readonly userId: number;
   readonly dto: ChatMessageModelDto;
 
-  constructor({ id, userId, dto }: ChatMessageModelParams) {
-    this.id = id;
-    this.userId = userId;
-    this.dto = dto;
+  constructor(chatMessage: ChatMessage) {
+    this.id = chatMessage.id;
+    this.userId = chatMessage.userId;
+
+    const role = (chatMessage.role == ChatMessageRole.USER)
+        ? ChatMessageModelRole.USER : ChatMessageModelRole.ASSISTANT;
+
+    this.dto = {
+      text: chatMessage.text,
+      summary: chatMessage.summary,
+      role: role,
+      sent: chatMessage.sent,
+      lastEdited: chatMessage.lastEdited,
+    }
   }
 
   promptify(): string {
