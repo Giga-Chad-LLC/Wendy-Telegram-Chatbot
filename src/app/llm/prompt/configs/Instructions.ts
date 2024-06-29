@@ -1,4 +1,4 @@
-import instructions from "../../../prompting/instructions.json";
+import instructions from "../../prompting/instructions.json";
 
 
 export class buildExampleConversationInstruction {

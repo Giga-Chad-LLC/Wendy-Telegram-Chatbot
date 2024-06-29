@@ -9,27 +9,30 @@ export enum PromptTemplateVariables {
 
   USER_NAME = '{{USER_NAME}}',
   QUESTIONNAIRE = '{{QUESTIONNAIRE}}',
-  CHAT_MESSAGE = '{{CHAT_MESSAGE}}',
-  // TODO: define message summaries & last messages
+  LAST_CHAT_MESSAGE = '{{LAST_CHAT_MESSAGE}}',
+  SUMMARIZED_MESSAGES = '{{SUMMARIZED_MESSAGES}}',
+  CONVERSATION_MESSAGES = '{{CONVERSATION_MESSAGES}}',
 
   INSTRUCTION = '{{INSTRUCTION}}',
   OUTPUT_FORMAT = '{{OUTPUT_FORMAT}}',
   CONVERSATION_EXAMPLE = '{{CONVERSATION_EXAMPLE}}',
 }
 
-export namespace PromptTemplateVariables {
-  export function fromString(variable: string) {
-    switch (variable) {
-      case '{{PERSONA_DESCRIPTION}}': return PromptTemplateVariables.PERSONA_DESCRIPTION;
-      case '{{PERSONA_NAME}}': return PromptTemplateVariables.PERSONA_NAME;
-      case '{{USER_NAME}}': return PromptTemplateVariables.USER_NAME;
-      case '{{QUESTIONNAIRE}}': return PromptTemplateVariables.QUESTIONNAIRE;
-      case '{{CHAT_MESSAGE}}': return PromptTemplateVariables.CHAT_MESSAGE;
-      case '{{INSTRUCTION}}': return PromptTemplateVariables.INSTRUCTION;
-      case '{{OUTPUT_FORMAT}}': return PromptTemplateVariables.OUTPUT_FORMAT;
-      case '{{CONVERSATION_EXAMPLE}}': return PromptTemplateVariables.CONVERSATION_EXAMPLE;
-      default: throw new ApplicationError(`Provided variable '${variable}' cannot be converted to enum`)
-    }
+function fromStringToPromptTemplateVariableEnum(variable: string) {
+  switch (variable) {
+    case '{{PERSONA_DESCRIPTION}}': return PromptTemplateVariables.PERSONA_DESCRIPTION;
+    case '{{PERSONA_NAME}}': return PromptTemplateVariables.PERSONA_NAME;
+
+    case '{{USER_NAME}}': return PromptTemplateVariables.USER_NAME;
+    case '{{QUESTIONNAIRE}}': return PromptTemplateVariables.QUESTIONNAIRE;
+    case '{{LAST_CHAT_MESSAGE}}': return PromptTemplateVariables.LAST_CHAT_MESSAGE;
+    case '{{SUMMARIZED_MESSAGES}}': return PromptTemplateVariables.SUMMARIZED_MESSAGES;
+    case '{{CONVERSATION_MESSAGES}}': return PromptTemplateVariables.CONVERSATION_MESSAGES;
+
+    case '{{INSTRUCTION}}': return PromptTemplateVariables.INSTRUCTION;
+    case '{{OUTPUT_FORMAT}}': return PromptTemplateVariables.OUTPUT_FORMAT;
+    case '{{CONVERSATION_EXAMPLE}}': return PromptTemplateVariables.CONVERSATION_EXAMPLE;
+    default: throw new ApplicationError(`Provided variable '${variable}' cannot be converted to enum`)
   }
 }
 
@@ -103,7 +106,7 @@ export class PromptTemplate {
     const variables = PromptTemplate.collectPromptTemplateVariables(this.template);
 
     for (const variable of variables) {
-      const enumVariable = PromptTemplateVariables.fromString(variable);
+      const enumVariable = fromStringToPromptTemplateVariableEnum(variable);
 
       if (!this.variableAssignments.has(enumVariable)) {
         throw new ApplicationError(`Variable '${variable}' is not set but present in the template`);
@@ -128,6 +131,8 @@ export class PromptTemplate {
     variables.forEach(usedVariable => {
       let found = false;
       for (const registeredVariable in PromptTemplateVariables) {
+        // transforms the enum entry name into its value
+        // e.g., PERSONA_DESCRIPTION -> {{PERSONA_DESCRIPTION}}
         const enumVariableValue = PromptTemplateVariables[registeredVariable as keyof typeof PromptTemplateVariables];
 
         if (usedVariable == enumVariableValue) {

@@ -36,15 +36,37 @@ Here is an example of possible conversation between {{PERSONA_NAME}} and {{USER_
 {{CONVERSATION_EXAMPLE}}
 
 
-### Last message of {{USER_NAME}}:
-{{CHAT_MESSAGE}}
+From now on, you respond ONLY with messages of {{PERSONA_NAME}}.`,
 
+  // TODO: create a template for summarizing messages
 
-From now on, you respond ONLY with character's persona messages.`,
-
-  dialogInitializationInstructionPromptTemplate: `
+  generalDialogInstructionPromptTemplate: `
 ### Your Persona:
 {{PERSONA_DESCRIPTION}}
-${1/* TODO: finalize prompt! */}
-`
+
+
+### Instruction:
+{{INSTRUCTION}}
+
+
+### About conversation partner: 
+You are talking with a person named {{USER_NAME}}. Here is her summary:
+{{QUESTIONNAIRE}}
+
+
+### Recent updates of {{USER_NAME}}:
+Here are the recent updates of the life of {{USER_NAME}} based on the conversation you both had before.
+Here is the summaries of messages:
+{{SUMMARIZED_MESSAGES}}
+
+
+### Last conversation messages:
+{{CONVERSATION_MESSAGES}}
+
+
+### Last message of {{USER_NAME}}:
+{{LAST_CHAT_MESSAGE}}
+
+
+From now on, you respond ONLY with messages of {{PERSONA_NAME}}.`
 };

@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { Telegraf } from 'telegraf';
 import dotenv from 'dotenv';
-import { OpenAILlmProvider } from './llm/providers/OpenAILlmProvider';
+import { OpenAILlmProvider } from './app/llm/providers/OpenAILlmProvider';
 
 // Mount variables from .env into process.env
 dotenv.config();

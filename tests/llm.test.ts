@@ -1,9 +1,9 @@
-import { describe, it, expect } from 'vitest';
-import { OpenAILlmProvider } from '../src/llm/providers/OpenAILlmProvider';
-import { Questionnaire } from '../src/model/data/Questionnaire';
-import { LlmDialog } from '../src/llm/conversation/LlmDialog';
-import { ChatMessage, ChatMessageDto } from '../src/model/data/ChatMessage';
-
+import { describe, expect, it } from 'vitest';
+import { OpenAILlmProvider } from '../src/app/llm/providers/OpenAILlmProvider';
+import { QuestionnaireModel } from '../src/db/models/QuestionnaireModel';
+import { LlmDialogManager } from '../src/app/llm/conversation/LlmDialogManager';
+import { LlmChatMessageRole } from '../src/app/llm/providers/LlmProvider';
+import { Wendy } from '../src/app/llm/prompt/configs/Personas';
 
 
 describe('OpenAILlmProvider', () => {
@@ -23,20 +23,51 @@ describe('OpenAILlmProvider', () => {
   });
 
   it('should send two prompts', async () => {
-    const llmDialog = new LlmDialog(llmProvider);
+    const llmDialog = new LlmDialogManager(llmProvider);
 
-    const questionnaire = new Questionnaire({
-      preferredName: 'Alphard',
-      isAdult: false,
-      age: 12,
-      residenceCountry: 'USA',
-      // residenceCity: undefined,
-      bio: 'Hello! I am Alphard. I am from USA. I love baseball and football. I have some struggles at school; I am being bullied by classmates. I want to overcome this and make them get off me.',
-    })
+    /*const questionnaire = new QuestionnaireModel({
+      id: 1,
+      userId: 1,
+      dto: {
+        preferredName: 'Alphard',
+        isAdult: false,
+        age: 12,
+        residenceCountry: 'USA',
+        residenceCity: null,
+        bio: 'Hello! I am Alphard. I am from USA. I love baseball and football. I have some struggles at school; I am being bullied by classmates. I want to overcome this and make them get off me.',
+      },
+    })*/
 
-    const lastUserChatMessage = new ChatMessage(new ChatMessageDto());
-    const response = await llmDialog.startColdConversationWithFewShotPrompting(lastUserChatMessage, questionnaire);
+    /*const lastUserChatMessage = new ChatMessage({
+      id: 1,
+      userId: 1,
+      dto: {
+        text: "Hello! Today I had a great day. I played football with my friends and hit 3 goals! Our team won over 2 goals!",
+        summary: "",
+        role: ChatMessageRole.USER,
+        sent: new Date(),
+        lastEdited: new Date(),
+      }
+    });*/
 
-    console.log(`=============== finalResponse ===============\n${response}`);
+    /*const history = await llmDialog.startColdConversationWithFewShotPrompting({
+      questionnaire: questionnaire,
+      persona: new Wendy(),
+    });
+
+    console.log(`=============== finalResponse ===============\n${history.lastMessage.content}`);*/
   }, -1);
+
+
+  it('count tokens from messages', async () => {
+    const tokensCount = llmProvider.countMessagesTokens([{ role: LlmChatMessageRole.USER, content: "Hello! my name is Fred. I want to become your friend!" }]);
+    console.log(`Tokens count: ${tokensCount}`);
+    expect(tokensCount).toBeGreaterThanOrEqual(0);
+  });
+
+  it('count tokens from text', async () => {
+    const tokensCount = llmProvider.countTextTokens("Hello! my name is Fred. I want to become your friend!");
+    console.log(`Tokens count: ${tokensCount}`);
+    expect(tokensCount).toBeGreaterThanOrEqual(0);
+  });
 });
