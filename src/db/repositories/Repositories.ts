@@ -1,5 +1,3 @@
-import { PrismaClient } from '@prisma/client';
-
 
 // TODO: where to prisma.$disconnect()?
 export interface IRepository<T> {
@@ -16,9 +14,9 @@ export interface IByIdRetrievableRepository<T> {
 }
 
 export interface IByUserIdManyRetrievableRepository<T> {
-  getUserById(id: number): Promise<T[] | null>;
+  getByUserId(id: number): Promise<T[] | null>;
 }
 
 export interface IByUserIdUniqueRetrievableRepository<T> {
-  getUserById(id: number): Promise<T | null>;
+  getByUserId(id: number): Promise<T | null>;
 }

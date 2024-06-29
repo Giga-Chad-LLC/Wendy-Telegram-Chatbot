@@ -22,7 +22,7 @@ export class ChatMessageRepository implements IRepository<ChatMessage>, IByUserI
     return this.prisma.chatMessage.update({ where: { id }, data });
   }
 
-  getUserById(id: number): Promise<ChatMessage[] | null> {
+  getByUserId(id: number): Promise<ChatMessage[] | null> {
     return this.prisma.chatMessage.findMany({ where: { id } });
   }
 
@@ -53,6 +53,4 @@ export class ChatMessageRepository implements IRepository<ChatMessage>, IByUserI
       take: limit,
     });
   }
-
-
 }
