@@ -4,8 +4,8 @@ import { promptTemplates } from '../prompting/PromptTemplates';
 import { PromptTemplate, PromptTemplateVariables } from '../prompt/template/PromptTemplate';
 import { Persona } from '../prompt/configs/Personas';
 import {
-  buildExampleConversationInstruction,
-  converseWithPartnerAccordingToPersonaInstruction,
+  BuildExampleConversationInstruction,
+  ConverseWithPartnerAccordingToPersonaInstruction, SummarizeMessageInstruction,
 } from '../prompt/configs/Instructions';
 import { LlmRegex } from '../../regex/llmRegex';
 import { ApplicationError } from '../../errors/ApplicationError';
@@ -50,7 +50,7 @@ export class LlmDialogManager {
       const initialInstructionPrompt = new PromptTemplate(promptTemplates.coldConversationStartInstructionPromptTemplate)
         .set(PromptTemplateVariables.PERSONA_DESCRIPTION, persona.description)
         .set(PromptTemplateVariables.PERSONA_NAME, persona.personaName)
-        .set(PromptTemplateVariables.INSTRUCTION, converseWithPartnerAccordingToPersonaInstruction.instruction)
+        .set(PromptTemplateVariables.INSTRUCTION, ConverseWithPartnerAccordingToPersonaInstruction.instruction)
         .set(PromptTemplateVariables.QUESTIONNAIRE, questionnaire.promptify())
         .set(PromptTemplateVariables.CONVERSATION_EXAMPLE, conversationExample)
         .set(PromptTemplateVariables.USER_NAME, questionnaire.dto.preferredName)
@@ -68,15 +68,14 @@ export class LlmDialogManager {
     }
   }
 
-
   private async createAuxiliaryConversationExample(questionnaire: QuestionnaireModel, persona: Persona): Promise<string> {
     try {
       const buildExampleConversationPrompt = new PromptTemplate(promptTemplates.buildExampleConversationPromptTemplate)
         .set(PromptTemplateVariables.PERSONA_DESCRIPTION, persona.description)
-        .set(PromptTemplateVariables.INSTRUCTION, buildExampleConversationInstruction.instruction)
+        .set(PromptTemplateVariables.INSTRUCTION, BuildExampleConversationInstruction.instruction)
         .set(PromptTemplateVariables.QUESTIONNAIRE, questionnaire.promptify())
         .set(PromptTemplateVariables.USER_NAME, questionnaire.dto.preferredName)
-        .set(PromptTemplateVariables.OUTPUT_FORMAT, buildExampleConversationInstruction.outputFormat)
+        .set(PromptTemplateVariables.OUTPUT_FORMAT, BuildExampleConversationInstruction.outputFormat)
         .build();
 
       const llmResponse = await this.llmProvider.sendMessage(buildExampleConversationPrompt);
@@ -109,13 +108,35 @@ export class LlmDialogManager {
 
     try {
       const llmResponseMessage = await this.llmProvider.sendMessages([
-        history.initialSystemPrompt, ...history.messages
+        history.initialSystemPrompt, ...history.messages,
       ]);
       return new Promise<AssistantLlmChatMessage>((resolve, _) => resolve(new AssistantLlmChatMessage(llmResponseMessage)));
     }
     catch (error) {
       return new Promise<AssistantLlmChatMessage>((_, reject) => {
         reject(new ApplicationError("Conversation attempt failed", error as Error));
+      });
+    }
+  }
+
+
+  async summarizeMessage(message: string): Promise<string> {
+    try {
+      const constructSummaryInstructionPrompt = new PromptTemplate(
+        promptTemplates.messageSummaryCreationInstructionPromptTemplate)
+        .set(PromptTemplateVariables.INSTRUCTION, SummarizeMessageInstruction.instruction)
+        .set(PromptTemplateVariables.LAST_CHAT_MESSAGE, message)
+        .set(PromptTemplateVariables.OUTPUT_FORMAT, SummarizeMessageInstruction.outputFormat)
+        .build();
+
+      const summary = await this.llmProvider.sendMessage(constructSummaryInstructionPrompt);
+      console.log(`Message Summary: \n'''${summary}\n'''`);
+
+      return new Promise<string>((resolve, _) => resolve(summary));
+    }
+    catch (error) {
+      return new Promise((_, reject) => {
+        reject(new ApplicationError(`Cannot summarize the message:\n'''${message}\n'''`, error as Error));
       });
     }
   }
@@ -140,7 +161,7 @@ export class LlmDialogManager {
     return new PromptTemplate(promptTemplates.generalDialogInstructionPromptTemplate)
       .set(PromptTemplateVariables.PERSONA_DESCRIPTION, persona.description)
       .set(PromptTemplateVariables.PERSONA_NAME, persona.personaName)
-      .set(PromptTemplateVariables.INSTRUCTION, converseWithPartnerAccordingToPersonaInstruction.instruction)
+      .set(PromptTemplateVariables.INSTRUCTION, ConverseWithPartnerAccordingToPersonaInstruction.instruction)
       .set(PromptTemplateVariables.QUESTIONNAIRE, questionnaire.promptify())
       .set(PromptTemplateVariables.SUMMARIZED_MESSAGES, summarizedMessagesComponent)
       .set(PromptTemplateVariables.CONVERSATION_MESSAGES, recentMessagesComponent)
