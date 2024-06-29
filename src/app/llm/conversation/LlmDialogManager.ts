@@ -1,6 +1,6 @@
 import { AssistantLlmChatMessage, LlmProvider, SystemLlmChatMessage } from '../providers/LlmProvider';
 import { QuestionnaireModel } from '../../../db/models/QuestionnaireModel';
-import { promptTemplates } from '../../prompting/PromptTemplates';
+import { promptTemplates } from '../prompting/PromptTemplates';
 import { PromptTemplate, PromptTemplateVariables } from '../prompt/template/PromptTemplate';
 import { Persona } from '../prompt/configs/Personas';
 import {

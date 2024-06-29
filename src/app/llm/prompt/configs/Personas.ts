@@ -1,4 +1,4 @@
-import personas from "../../../prompting/personas.json";
+import personas from "../../prompting/personas.json";
 
 
 export class Persona {
