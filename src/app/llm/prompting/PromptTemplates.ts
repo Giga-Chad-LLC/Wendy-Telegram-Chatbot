@@ -1,4 +1,3 @@
-
 export const promptTemplates = {
   buildExampleConversationPromptTemplate: `
 ### Your Persona:
