@@ -10,7 +10,8 @@ export enum PromptTemplateVariables {
   USER_NAME = '{{USER_NAME}}',
   QUESTIONNAIRE = '{{QUESTIONNAIRE}}',
   CHAT_MESSAGE = '{{CHAT_MESSAGE}}',
-  // TODO: define message summaries & last messages
+  SUMMARIZED_MESSAGES = '{{SUMMARIZED_MESSAGES}}',
+  CONVERSATION_MESSAGES = '{{CONVERSATION_MESSAGES}}',
 
   INSTRUCTION = '{{INSTRUCTION}}',
   OUTPUT_FORMAT = '{{OUTPUT_FORMAT}}',
@@ -22,9 +23,13 @@ export namespace PromptTemplateVariables {
     switch (variable) {
       case '{{PERSONA_DESCRIPTION}}': return PromptTemplateVariables.PERSONA_DESCRIPTION;
       case '{{PERSONA_NAME}}': return PromptTemplateVariables.PERSONA_NAME;
+
       case '{{USER_NAME}}': return PromptTemplateVariables.USER_NAME;
       case '{{QUESTIONNAIRE}}': return PromptTemplateVariables.QUESTIONNAIRE;
       case '{{CHAT_MESSAGE}}': return PromptTemplateVariables.CHAT_MESSAGE;
+      case '{{SUMMARIZED_MESSAGES}}': return PromptTemplateVariables.SUMMARIZED_MESSAGES;
+      case '{{CONVERSATION_MESSAGES}}': return PromptTemplateVariables.CONVERSATION_MESSAGES;
+
       case '{{INSTRUCTION}}': return PromptTemplateVariables.INSTRUCTION;
       case '{{OUTPUT_FORMAT}}': return PromptTemplateVariables.OUTPUT_FORMAT;
       case '{{CONVERSATION_EXAMPLE}}': return PromptTemplateVariables.CONVERSATION_EXAMPLE;
