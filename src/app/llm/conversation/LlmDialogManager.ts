@@ -10,7 +10,7 @@ import {
 import { LlmRegex } from '../../regex/llmRegex';
 import { ApplicationError } from '../../errors/ApplicationError';
 import { LlmChatHistory } from './LlmChatHistory';
-import { ChatMessage } from '../../../db/models/ChatMessage';
+import { ChatMessageModel } from '../../../db/models/ChatMessageModel';
 
 
 export type ColdConversationParams = {
@@ -25,9 +25,9 @@ export type GeneralConversationParams = {
 
 export type CreateGeneralDialogInstructionPromptParams = {
   questionnaire: Questionnaire,
-  messagesToSummarize: ChatMessage[],
-  recentMessages: ChatMessage[],
-  lastUserMessage: ChatMessage,
+  messagesToSummarize: ChatMessageModel[],
+  recentMessages: ChatMessageModel[],
+  lastUserMessage: ChatMessageModel,
   persona: Persona,
 }
 

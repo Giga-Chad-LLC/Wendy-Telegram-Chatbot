@@ -5,7 +5,7 @@ export enum ChatMessageRole {
   ASSISTANT = "assistant",
 }
 
-export type ChatMessageDto = {
+export type ChatMessageModelDto = {
   readonly text: string;
   readonly summary: string;
   readonly role: ChatMessageRole;
@@ -13,18 +13,18 @@ export type ChatMessageDto = {
   readonly lastEdited: Date;
 }
 
-export type ChatMessageParams = {
+export type ChatMessageModelParams = {
   id: number;
   userId: number;
-  dto: ChatMessageDto;
+  dto: ChatMessageModelDto;
 }
 
-export class ChatMessage implements IPromptifiable {
+export class ChatMessageModel implements IPromptifiable {
   readonly id: number;
   readonly userId: number;
-  readonly dto: ChatMessageDto;
+  readonly dto: ChatMessageModelDto;
 
-  constructor({ id, userId, dto }: ChatMessageParams) {
+  constructor({ id, userId, dto }: ChatMessageModelParams) {
     this.id = id;
     this.userId = userId;
     this.dto = dto;

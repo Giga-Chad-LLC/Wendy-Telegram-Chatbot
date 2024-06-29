@@ -3,7 +3,7 @@ import { UserRepository } from '../db/repositories/UserRepository';
 import { ChatMessageRepository } from '../db/repositories/ChatMessageRepository';
 import { LlmDialogManager } from '../app/llm/conversation/LlmDialogManager';
 import { LlmChatHistory } from '../app/llm/conversation/LlmChatHistory';
-import {ChatMessage as ChatMessageModel } from '../db/models/ChatMessage';
+import { ChatMessageModel } from '../db/models/ChatMessageModel';
 
 export type ConversationContinuationParams = {
   lastUserMessage: string;

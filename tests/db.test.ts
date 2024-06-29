@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ChatMessage, ChatMessageRole } from '../src/db/models/ChatMessage';
+import { ChatMessageModel, ChatMessageRole } from '../src/db/models/ChatMessageModel';
 
 
 describe('Database models', () => {
@@ -9,7 +9,7 @@ describe('Database models', () => {
   });
 
   it('ChatMessage correctly promptifies', async () => {
-    const chatMessage = new ChatMessage({
+    const chatMessage = new ChatMessageModel({
       id: 1,
       userId: 1,
       dto: {
