@@ -13,29 +13,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id  Int @id @default(autoincrement())
-  telegramFirstName  String
+  telegramFirstName String
   telegramLastName  String
-  telegramUserId  String
-  telegramChatId  Int @unique
-  since DateTime @default(now())
-  questionnaire Questionnaire?
-  messages  ChatMessage[]
-  notifications RecurringChatNotification[]
+  telegramUserId    Int                         @id @default(autoincrement())
+  telegramChatId    Int                         @unique
+  since             DateTime                    @default(now())
+  questionnaire     Questionnaire?
+  messages          ChatMessage[]
+  notifications     RecurringChatNotification[]
 }
 
 model Questionnaire {
-  id  Int @id @default(autoincrement())
-  userId  Int @unique
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  preferredName String
-  bio String
-  age Int?
-  isAdult Boolean
-  residenceCountry  String
-  residenceCity String?
+  userId           Int      @id
+  user             User     @relation(fields: [userId], references: [telegramUserId], onDelete: Cascade)
+  preferredName    String
+  bio              String
+  bday             DateTime
+  isAdult          Boolean  @default(false)
+  residenceCountry String
 }
 
 enum ChatMessageRole {
@@ -44,19 +40,19 @@ enum ChatMessageRole {
 }
 
 model ChatMessage {
-  id  Int @id @default(autoincrement())
-  userId  Int
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  summary String
-  text  String
-  role  ChatMessageRole
-  sent  DateTime @default(now()) @db.Timestamptz
-  lastEdited  DateTime @default(now()) @db.Timestamptz
+  id         Int             @id @default(autoincrement())
+  userId     Int
+  user       User            @relation(fields: [userId], references: [telegramUserId], onDelete: Cascade)
+  summary    String
+  text       String
+  role       ChatMessageRole
+  sent       DateTime        @default(now()) @db.Timestamptz
+  lastEdited DateTime        @default(now()) @db.Timestamptz
 }
 
 model RecurringChatNotification {
-  id  Int @id @default(autoincrement())
-  userId  Int @unique
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  dayTimepoint  Int // TODO: should it be DateTime?
+  id           Int  @id @default(autoincrement())
+  userId       Int  @unique
+  user         User @relation(fields: [userId], references: [telegramUserId], onDelete: Cascade)
+  dayTimepoint Int // TODO: should it be DateTime?
 }

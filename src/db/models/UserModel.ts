@@ -9,11 +9,9 @@ export type UserModelDto = {
 }
 
 export class UserModel {
-  readonly id: number;
   readonly dto: UserModelDto;
 
   constructor(user: User) {
-    this.id = user.id;
     this.dto = {
       telegramFirstName: user.telegramFirstName,
       telegramLastName: user.telegramLastName,
