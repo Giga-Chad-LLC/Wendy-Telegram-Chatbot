@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { OpenAILlmProvider } from '../src/app/llm/providers/OpenAILlmProvider';
 import { Questionnaire } from '../src/db/models/Questionnaire';
-import { LlmDialog } from '../src/app/llm/conversation/LlmDialog';
-import { ChatMessage, ChatMessageRole } from '../src/db/models/ChatMessage';
+import { LlmDialogManager } from '../src/app/llm/conversation/LlmDialogManager';
 import { LlmChatMessageRole } from '../src/app/llm/providers/LlmProvider';
 import { Wendy } from '../src/app/llm/prompt/configs/Personas';
 
@@ -24,7 +23,7 @@ describe('OpenAILlmProvider', () => {
   });
 
   it('should send two prompts', async () => {
-    const llmDialog = new LlmDialog(llmProvider);
+    const llmDialog = new LlmDialogManager(llmProvider);
 
     const questionnaire = new Questionnaire({
       id: 1,
@@ -39,7 +38,7 @@ describe('OpenAILlmProvider', () => {
       },
     })
 
-    const lastUserChatMessage = new ChatMessage({
+    /*const lastUserChatMessage = new ChatMessage({
       id: 1,
       userId: 1,
       dto: {
@@ -49,15 +48,14 @@ describe('OpenAILlmProvider', () => {
         sent: new Date(),
         lastEdited: new Date(),
       }
-    });
+    });*/
 
-    const response = await llmDialog.startColdConversationWithFewShotPrompting({
-      lastUserChatMessage: lastUserChatMessage.dto.text,
+    const history = await llmDialog.startColdConversationWithFewShotPrompting({
       questionnaire: questionnaire,
       persona: new Wendy(),
     });
 
-    console.log(`=============== finalResponse ===============\n${response}`);
+    console.log(`=============== finalResponse ===============\n${history.lastMessage.content}`);
   }, -1);
 
 
