@@ -115,7 +115,9 @@ export class LlmDialogManager {
     this.checkHistoryTokenLimit(history);
 
     try {
-      const llmResponse = await this.llmProvider.sendMessages(history.messages);
+      const llmResponse = await this.llmProvider.sendMessages([
+        history.initialSystemPrompt, ...history.messages
+      ]);
       const assistantMessage = new AssistantLlmChatMessage(llmResponse);
 
       const updatedHistory = new LlmChatHistory({
