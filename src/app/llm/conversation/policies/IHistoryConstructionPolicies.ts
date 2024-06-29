@@ -66,7 +66,7 @@ export class TwoMessageHistoryConstructionPolicy implements IHistoryConstruction
           userId: userId,
           // we sort in the order to have the newest messages first
           field: "sent",
-          ascending: true,
+          ascending: false,
           page: currentPage,
           limit: TwoMessageHistoryConstructionPolicy.MESSAGES_PAGE_LIMIT_PER_DB_REQUEST,
         });
