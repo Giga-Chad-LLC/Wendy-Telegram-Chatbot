@@ -3,6 +3,7 @@ import { OpenAILlmProvider } from '../src/app/llm/providers/OpenAILlmProvider';
 import { Questionnaire } from '../src/db/models/Questionnaire';
 import { LlmDialog } from '../src/app/llm/conversation/LlmDialog';
 import { ChatMessage, ChatMessageRole } from '../src/db/models/ChatMessage';
+import { LlmChatMessageRole } from '../src/app/llm/providers/LlmProvider';
 
 
 describe('OpenAILlmProvider', () => {
@@ -53,4 +54,11 @@ describe('OpenAILlmProvider', () => {
 
     console.log(`=============== finalResponse ===============\n${response}`);
   }, -1);
+
+
+  it('count tokens from messages', async () => {
+    const tokensCount = llmProvider.countTokens([{ role: LlmChatMessageRole.USER, content: "Hello! my name is Fred. I want to become your friend!" }]);
+    console.log(`Tokens count: ${tokensCount}`);
+    expect(tokensCount).toBeGreaterThanOrEqual(0);
+  });
 });

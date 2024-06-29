@@ -1,4 +1,5 @@
 
+
 export interface LlmProviderParams {
   token: string;
   model: string;
@@ -17,5 +18,6 @@ export type LlmChatMessage = {
 export interface LlmProvider {
   sendMessage(message: string): Promise<string>;
   sendMessages(messages: LlmChatMessage[]): Promise<string>;
+  countTokens(messages: LlmChatMessage[]): number;
 }
 

@@ -1,7 +1,8 @@
 import { OpenAI } from 'openai';
-import { LlmProvider, LlmProviderParams, LlmChatMessageRole, LlmChatMessage } from './LlmProvider';
-
-
+import * as tiktoken from 'tiktoken';
+import { TiktokenModel } from 'tiktoken';
+import { LlmChatMessage, LlmChatMessageRole, LlmProvider, LlmProviderParams } from './LlmProvider';
+import { ApplicationError } from '../../errors/ApplicationError';
 
 
 export class OpenAILlmProvider implements LlmProvider {
@@ -40,6 +41,25 @@ export class OpenAILlmProvider implements LlmProvider {
     }
     catch (error) {
       return new Promise<string>((_, reject) => reject(error));
+    }
+  }
+
+  countTokens(messages: LlmChatMessage[]): number {
+    let enc: tiktoken.Tiktoken | null = null;
+    try {
+      enc = tiktoken.encoding_for_model(this.model as TiktokenModel);
+      return messages
+        .map(msg => enc!.encode(msg.content).length)
+        .reduce((acc, value) => acc + value, 0);
+    }
+    catch (error) {
+      console.error(error);
+      throw new ApplicationError("Cannot encode message and count tokens number", error as Error);
+    }
+    finally {
+      if (enc) {
+        enc.free();
+      }
     }
   }
 }
