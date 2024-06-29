@@ -1,4 +1,4 @@
-import { AssistantLlmChatMessage, LlmProvider, SystemLlmChatMessage } from '../providers/LlmProvider';
+import { AssistantLlmChatMessage, LlmChatMessage, LlmProvider, SystemLlmChatMessage } from '../providers/LlmProvider';
 import { QuestionnaireModel } from '../../../db/models/QuestionnaireModel';
 import { promptTemplates } from '../prompting/PromptTemplates';
 import { PromptTemplate, PromptTemplateVariables } from '../prompt/template/PromptTemplate';
@@ -109,10 +109,10 @@ export class LlmDialogManager {
   }
 
 
-  // TODO: caller should update history before calling this method
-  // TODO: we should store last system message in database as well!
+  // TODO: caller should update history before calling this method (write javadoc)
+  // TODO: we should store last system message in database as well?
   async converse({ history }: GeneralConversationParams): Promise<LlmChatHistory> {
-    this.checkHistoryTokenLimit(history);
+    this.checkTokenLimit([ history.initialSystemPrompt, ...history.messages ]);
 
     try {
       const llmResponse = await this.llmProvider.sendMessages([
@@ -164,20 +164,19 @@ export class LlmDialogManager {
       .build();
   }
 
-
-  private checkHistoryTokenLimit(history: LlmChatHistory) {
+  private checkTokenLimit(messages: LlmChatMessage[]) {
     const limit = this.llmProvider.getTokenLimit();
-    const currentTokenNumber = this.llmProvider.countMessagesTokens(history.messages);
-    if (this.isTokenLimitExceeded(history)) {
+    const currentTokenNumber = this.llmProvider.countMessagesTokens(messages);
+    if (this.isTokenLimitExceeded(messages)) {
       throw new ApplicationError(`History has ${currentTokenNumber} tokens and exceeds token limit of ${limit}`);
 
     }
   }
 
-
-  isTokenLimitExceeded(history: LlmChatHistory): boolean {
+  isTokenLimitExceeded(messages: LlmChatMessage[]): boolean {
     const limit = this.llmProvider.getTokenLimit();
-    const currentTokenNumber = this.llmProvider.countMessagesTokens(history.messages);
+    const currentTokenNumber = this.llmProvider.countMessagesTokens(messages);
     return (currentTokenNumber > limit);
   }
+
 }
