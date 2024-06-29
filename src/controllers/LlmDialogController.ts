@@ -12,7 +12,7 @@ import { ApplicationError } from '../app/errors/ApplicationError';
 import { sliceArrayInGroupsByK } from '../app/utils/CollectionsUtils';
 
 export type ConversationContinuationParams = {
-  lastUserMessage: string;
+  lastUserMessageContent: string;
   userId: number;
   persona: Persona;
 }
@@ -36,7 +36,7 @@ export class LlmDialogController {
     this.questionnaireRepository = new QuestionnaireRepository();
   }
 
-  async converse({ lastUserMessage, userId, persona }: ConversationContinuationParams) {
+  async converse({ lastUserMessageContent, userId, persona }: ConversationContinuationParams) {
     // retrieve data required for the system prompt
     const questionnaire = (await this.questionnaireRepository.getByUserId(userId));
 
@@ -45,87 +45,123 @@ export class LlmDialogController {
       throw new ApplicationError(`User with id ${userId} did not fill out the questionnaire`);
     }
 
-    const newUserLlmMessage = new UserLlmChatMessage(lastUserMessage);
-
-    // TODO: used as base case; for testing; need to find better way
-    const emptyInitialSystemPrompt = this.llmDialogManager.createGeneralDialogInstructionPrompt({
+    const constructedHistory = await this.constructHistory({
+      userId,
       questionnaire: new QuestionnaireModel(questionnaire),
-      messagesToSummarize: [],
-      recentMessages: [],
-      lastUserMessage: lastUserMessage,
-      persona: persona,
+      lastUserMessageContent,
+      persona,
     });
 
-    // TODO: make sure it does not exceed the context or at least catch error
-    let currentHistory: LlmChatHistory = new LlmChatHistory({
-      messages: [newUserLlmMessage],
-      initialSystemPrompt: new SystemLlmChatMessage(emptyInitialSystemPrompt),
-      lastMessage: newUserLlmMessage,
-    });
-
-    // TODO: move consts somewhere else
-    const summarizedMessagesCount = 15;
-    const recentMessagesCount = 10;
-    const limit = summarizedMessagesCount + recentMessagesCount;
-    let page = 1;
-
-    // TODO: create strategy/policy pattern and move algo there
-    let sufficientHistoryCrafted = false;
-    while (!sufficientHistoryCrafted) {
-      let messages = await this.chatMessageRepository.getPaginatedSortedMessages({
-        userId: userId,
-        field: "sent", // newest messages first
-        ascending: true,
-        page: page,
-        limit: limit,
-      });
-
-      // check whether there are messages between user and assistant on current page
-      if (messages.length > 0) {
-        const {
-          firstGroup: recentMessages,
-          secondGroup: messagesToSummarize,
-        } = sliceArrayInGroupsByK({ items: messages, firstGroupSize: recentMessagesCount });
-
-        // craft initial prompt for history
-        const initialSystemPrompt = this.llmDialogManager.createGeneralDialogInstructionPrompt({
-          questionnaire: new QuestionnaireModel(questionnaire),
-          messagesToSummarize: messagesToSummarize.map(msg => new ChatMessageModel(msg)),
-          recentMessages: recentMessages.map(msg => new ChatMessageModel(msg)),
-          lastUserMessage: lastUserMessage,
-          persona: new Wendy(), // TODO: no hard-coding!
-        });
-
-        const newPotentialHistory = new LlmChatHistory({
-          messages: [newUserLlmMessage],
-          initialSystemPrompt: new SystemLlmChatMessage(initialSystemPrompt),
-          lastMessage: newUserLlmMessage,
-        });
-
-        if (!this.llmDialogManager.isTokenLimitExceeded(newPotentialHistory)) {
-          currentHistory = newPotentialHistory;
-        }
-        else {
-          sufficientHistoryCrafted = true;
-        }
-
-        // preparing to retrieve next page on next loop iteration
-        page += 1;
-      }
-      else {
-        sufficientHistoryCrafted = true;
-      }
-    }
-
-    console.log(`History Crafted: messages count: ${currentHistory.messages.length}`)
-    console.log(`History's Initial System Prompt:\n"""${currentHistory.initialSystemPrompt.content}\n"""`)
-    console.log(`User's Last Message:\n"""${currentHistory.lastMessage.content}\n"""`)
+    console.log(`History Crafted: messages count: ${constructedHistory.messages.length}`)
+    console.log(`History's Initial System Prompt:\n"""${constructedHistory.initialSystemPrompt.content}\n"""`)
+    console.log(`User's Last Message:\n"""${constructedHistory.lastMessage.content}\n"""`)
 
     // use current history to make conversation prompts
     // TODO: we need only LLM response message, it'll be saved into DB, no need in entire history
-    const updatedHistory = await this.llmDialogManager.converse({ history: currentHistory });
+    const historyWithLlmResponse = await this.llmDialogManager.converse({ history: constructedHistory });
 
     // TODO(vartiukhov): [IMPORTANT] save LLM response from updatedHistory into database
-    console.log(`Last LLM Message: ${updatedHistory.lastMessage.content}`);
+    console.log(`Last LLM Message: "${historyWithLlmResponse.lastMessage.content}"`);
+  }
+
+
+  private async constructHistory({
+    userId,
+    questionnaire,
+    lastUserMessageContent,
+    persona,
+
+  }: ConstructHistoryParams): Promise<LlmChatHistory> {
+    try {
+      // TODO: used as base case; for testing; need to find better way
+      const emptyInitialSystemPrompt = this.llmDialogManager.createGeneralDialogInstructionPrompt({
+        questionnaire: questionnaire,
+        messagesToSummarize: [],
+        recentMessages: [],
+        lastUserMessage: lastUserMessageContent,
+        persona: persona,
+      });
+
+      const newUserLlmMessage = new UserLlmChatMessage(lastUserMessageContent);
+
+      // TODO: make sure it does not exceed the context or at least catch error
+      let resultHistory: LlmChatHistory = new LlmChatHistory({
+        messages: [newUserLlmMessage],
+        initialSystemPrompt: new SystemLlmChatMessage(emptyInitialSystemPrompt),
+        lastMessage: newUserLlmMessage,
+      });
+
+      // TODO: move consts somewhere else
+      const summarizedMessagesCount = 15;
+      const recentMessagesCount = 10;
+      const limit = summarizedMessagesCount + recentMessagesCount;
+      let page = 1;
+
+      // TODO: create strategy/policy pattern and move algo there
+      let ableToExtendHistory = true;
+
+      while (ableToExtendHistory) {
+        let messages = await this.chatMessageRepository.getPaginatedSortedMessages({
+          userId: userId,
+          field: "sent", // newest messages first
+          ascending: true,
+          page: page,
+          limit: limit,
+        });
+
+        // check whether there are messages between user and assistant on current page
+        if (messages.length > 0) {
+          const {
+            firstGroup: recentMessages,
+            secondGroup: messagesToSummarize,
+          } = sliceArrayInGroupsByK({ items: messages, firstGroupSize: recentMessagesCount });
+
+          // craft initial prompt for history
+          const initialSystemPrompt = this.llmDialogManager.createGeneralDialogInstructionPrompt({
+            questionnaire: questionnaire,
+            messagesToSummarize: messagesToSummarize.map(msg => new ChatMessageModel(msg)),
+            recentMessages: recentMessages.map(msg => new ChatMessageModel(msg)),
+            lastUserMessage: lastUserMessageContent,
+            persona: persona,
+          });
+
+          const extendedHistory = new LlmChatHistory({
+            messages: [newUserLlmMessage],
+            initialSystemPrompt: new SystemLlmChatMessage(initialSystemPrompt),
+            lastMessage: newUserLlmMessage,
+          });
+
+          if (!this.llmDialogManager.isTokenLimitExceeded(extendedHistory)) {
+            resultHistory = extendedHistory;
+          }
+          else {
+            ableToExtendHistory = false;
+          }
+
+          // preparing to retrieve next page on next loop iteration
+          page += 1;
+        }
+        else {
+          ableToExtendHistory = false;
+        }
+      }
+
+      return new Promise((resolve, _) => resolve(resultHistory));
+    }
+    catch (error) {
+      return new Promise((_, reject) => {
+        const applicationError = new ApplicationError(
+          'Unable to construct history according to the algorithm', error as Error)
+        reject(applicationError);
+      });
+    }
+
   }
 }
+
+type ConstructHistoryParams = {
+  userId: number;
+  questionnaire: QuestionnaireModel,
+  lastUserMessageContent: string,
+  persona: Persona,
+};
