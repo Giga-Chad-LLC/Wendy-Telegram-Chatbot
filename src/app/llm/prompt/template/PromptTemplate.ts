@@ -113,7 +113,10 @@ export class PromptTemplate {
       }
 
       const value = this.variableAssignments.get(enumVariable)!;
-      builtPrompt = builtPrompt.replace(variable, value);
+
+      // replace multiple occurrences of variable
+      const variableRegex = new RegExp(variable, 'g');
+      builtPrompt = builtPrompt.replace(variableRegex, value);
     }
 
     return builtPrompt;
@@ -160,13 +163,12 @@ export class PromptTemplate {
     const variables: string[] = [];
 
     for (const match of matches) {
-      if (match[1] && !variables.includes(match[1])) {
-        variables.push(match[1]);
+      const variable = match[1];
+      if (variable && !variables.includes(variable)) {
+        variables.push(variable);
       }
     }
 
     return variables
   }
-
-
 }

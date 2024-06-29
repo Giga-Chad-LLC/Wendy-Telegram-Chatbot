@@ -12,7 +12,7 @@ export type LlmChatHistoryParams = {
 export class LlmChatHistory {
   readonly messages: LlmChatMessage[];
   readonly initialSystemPrompt: SystemLlmChatMessage;
-  readonly lastMessage: LlmChatMessage;
+  readonly lastMessage: LlmChatMessage; // TODO: getter?
 
   /**
    * @param messages messages <b>must NOT</b> contain the initial system prompt, use `initialSystemPrompt` to store it.
@@ -24,5 +24,4 @@ export class LlmChatHistory {
     this.initialSystemPrompt = initialSystemPrompt;
     this.lastMessage = lastMessage;
   }
-
 }

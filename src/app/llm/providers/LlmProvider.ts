@@ -42,7 +42,7 @@ export class SystemLlmChatMessage extends LlmChatMessage {
 
 
 export interface LlmProvider {
-  sendMessage(message: string): Promise<string>;
+  sendMessage(message: string): Promise<string>; // TODO: change type to LlmChatMessage
   sendMessages(messages: LlmChatMessage[]): Promise<string>;
   countMessagesTokens(messages: LlmChatMessage[]): number;
   countTextTokens(text: string): number;

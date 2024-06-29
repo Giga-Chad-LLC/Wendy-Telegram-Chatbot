@@ -13,7 +13,7 @@ export class QuestionnaireRepository implements IRepository<Questionnaire>, IByU
     return this.prisma.questionnaire.update({ where: { id }, data });
   }
 
-  getUserById(id: number): Promise<Questionnaire | null> {
+  getByUserId(id: number): Promise<Questionnaire | null> {
     return this.prisma.questionnaire.findUnique({ where: { id } });
   }
 }

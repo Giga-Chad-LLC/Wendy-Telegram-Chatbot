@@ -1,4 +1,3 @@
-
 export const promptTemplates = {
   buildExampleConversationPromptTemplate: `
 ### Your Persona:
@@ -10,7 +9,7 @@ export const promptTemplates = {
 
 
 ### About conversation partner: 
-You are talking with a person named {{USER_NAME}}. Here is her summary:
+You are talking with a person named {{USER_NAME}}. Here is information about them:
 {{QUESTIONNAIRE}}
 
 
@@ -27,7 +26,7 @@ You are talking with a person named {{USER_NAME}}. Here is her summary:
 
 
 ### About conversation partner: 
-You are talking with a person named {{USER_NAME}}. Here is her summary:
+You are talking with a person named {{USER_NAME}}. Here is information about them:
 {{QUESTIONNAIRE}}
 
 
@@ -38,7 +37,17 @@ Here is an example of possible conversation between {{PERSONA_NAME}} and {{USER_
 
 From now on, you respond ONLY with messages of {{PERSONA_NAME}}.`,
 
-  // TODO: create a template for summarizing messages
+  messageSummaryCreationInstructionPromptTemplate: `
+### Instruction:
+{{INSTRUCTION}}
+
+
+### Message to summarize:
+{{LAST_CHAT_MESSAGE}}
+
+
+### Output Format:
+{{OUTPUT_FORMAT}}`,
 
   generalDialogInstructionPromptTemplate: `
 ### Your Persona:
@@ -50,7 +59,7 @@ From now on, you respond ONLY with messages of {{PERSONA_NAME}}.`,
 
 
 ### About conversation partner: 
-You are talking with a person named {{USER_NAME}}. Here is her summary:
+You are talking with a person named {{USER_NAME}}. Here is information about them:
 {{QUESTIONNAIRE}}
 
 

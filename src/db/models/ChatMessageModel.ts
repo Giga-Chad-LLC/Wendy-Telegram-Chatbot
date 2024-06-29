@@ -40,7 +40,7 @@ export class ChatMessageModel implements IPromptifiable {
     // TODO: potentially slow due to `toLocaleString`
     return `[Sent on]: ${this.dto.sent.toLocaleString()}
 [Sent by]: ${role}
-[Message]: ${this.dto.text}`;
+[Message]: "${this.dto.text}"`;
   }
 
   promptifyAsSummary(): string {
@@ -49,6 +49,6 @@ export class ChatMessageModel implements IPromptifiable {
     return `Summarized version of the message:
 [Sent on]: ${this.dto.sent.toLocaleString()}
 [Sent by]: ${role}
-[Summary]: ${this.dto.summary}`;
+[Summary]: "${this.dto.summary}"`;
   }
 }

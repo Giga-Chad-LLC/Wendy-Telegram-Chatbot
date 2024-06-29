@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { OpenAILlmProvider } from '../src/app/llm/providers/OpenAILlmProvider';
-import { QuestionnaireModel } from '../src/db/models/QuestionnaireModel';
 import { LlmDialogManager } from '../src/app/llm/conversation/LlmDialogManager';
 import { LlmChatMessageRole } from '../src/app/llm/providers/LlmProvider';
 import { Wendy } from '../src/app/llm/prompt/configs/Personas';
+import { LlmDialogController } from '../src/controllers/LlmDialogController';
 
 
 describe('OpenAILlmProvider', () => {
@@ -22,6 +22,7 @@ describe('OpenAILlmProvider', () => {
     expect(response).not.toBe('');
   });
 
+  // TODO: adjust to make work (need access DB)
   it('should send two prompts', async () => {
     const llmDialog = new LlmDialogManager(llmProvider);
 
@@ -70,4 +71,32 @@ describe('OpenAILlmProvider', () => {
     console.log(`Tokens count: ${tokensCount}`);
     expect(tokensCount).toBeGreaterThanOrEqual(0);
   });
+
+
+  it('cold converse with LLM', async() => {
+    const llmDialogManager = new LlmDialogManager(llmProvider);
+    const controller = new LlmDialogController(llmDialogManager);
+
+    const assistantMessage = await controller.converseCold({
+      userId: 1,
+      persona: new Wendy(),
+    });
+
+    console.log(assistantMessage.content);
+  }, -1);
+
+
+  it('converse with LLM', async() => {
+    const llmDialogManager = new LlmDialogManager(llmProvider);
+    const controller = new LlmDialogController(llmDialogManager);
+
+    const assistantMessage = await controller.converse({
+      lastUserMessageContent: 'Hello! Tell me a bit about yourself. I want to make friends with you!',
+      userId: 1,
+      persona: new Wendy(),
+    });
+
+    console.log(assistantMessage.content);
+  }, -1);
+
 });

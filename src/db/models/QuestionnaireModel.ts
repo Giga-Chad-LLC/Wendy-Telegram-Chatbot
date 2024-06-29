@@ -36,11 +36,11 @@ export class QuestionnaireModel implements IPromptifiable {
    */
   promptify(): string {
     return `Preferred Name: ${this.dto.preferredName}
-      Maturity: ${this.dto.isAdult ? 'Adult' : 'Minor'}
-      ${this.dto.age ? `Age: ${this.dto.age}` : ''}
-      Country of residence: ${this.dto.residenceCountry}
-      ${this.dto.residenceCity ? `City of residence: ${this.dto.residenceCity}` : ''}
-      Bio sent by ${this.dto.preferredName} when you first met:
-      "${this.dto.bio}"`
+Maturity: ${this.dto.isAdult ? 'Adult' : 'Minor'}
+${this.dto.age ? `Age: ${this.dto.age}` : ''}
+Country of residence: ${this.dto.residenceCountry}
+${this.dto.residenceCity ? `City of residence: ${this.dto.residenceCity}` : ''}
+Bio sent by ${this.dto.preferredName} when you first met:
+"${this.dto.bio}"`
   }
 }
