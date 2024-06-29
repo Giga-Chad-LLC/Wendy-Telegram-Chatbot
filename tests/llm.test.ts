@@ -80,6 +80,7 @@ describe('OpenAILlmProvider', () => {
     await controller.converse({
       lastUserMessage: 'Hello! Tell me a bit about yourself. I want to make friends with you!',
       userId: 1,
+      persona: new Wendy(),
     });
   }, -1);
 

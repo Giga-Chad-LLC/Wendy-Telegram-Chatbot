@@ -7,13 +7,14 @@ import { ChatMessageModel } from '../db/models/ChatMessageModel';
 import { SystemLlmChatMessage, UserLlmChatMessage } from '../app/llm/providers/LlmProvider';
 import { QuestionnaireRepository } from '../db/repositories/QuestionnaireRepository';
 import { QuestionnaireModel } from '../db/models/QuestionnaireModel';
-import { Wendy } from '../app/llm/prompt/configs/Personas';
+import { Persona, Wendy } from '../app/llm/prompt/configs/Personas';
 import { ApplicationError } from '../app/errors/ApplicationError';
 import { sliceArrayInGroupsByK } from '../app/utils/CollectionsUtils';
 
 export type ConversationContinuationParams = {
   lastUserMessage: string;
   userId: number;
+  persona: Persona;
 }
 
 
@@ -35,7 +36,7 @@ export class LlmDialogController {
     this.questionnaireRepository = new QuestionnaireRepository();
   }
 
-  async converse({ lastUserMessage, userId }: ConversationContinuationParams) {
+  async converse({ lastUserMessage, userId, persona }: ConversationContinuationParams) {
     // retrieve data required for the system prompt
     const questionnaire = (await this.questionnaireRepository.getByUserId(userId));
 
@@ -43,9 +44,6 @@ export class LlmDialogController {
     if (!questionnaire) {
       throw new ApplicationError(`User with id ${userId} did not fill out the questionnaire`);
     }
-
-    // TODO: no hard-coding!
-    const persona = new Wendy();
 
     const newUserLlmMessage = new UserLlmChatMessage(lastUserMessage);
 
