@@ -36,15 +36,11 @@ Here is an example of possible conversation between {{PERSONA_NAME}} and {{USER_
 {{CONVERSATION_EXAMPLE}}
 
 
-### Last message of {{USER_NAME}}:
-{{CHAT_MESSAGE}}
-
-
 From now on, you respond ONLY with messages of {{PERSONA_NAME}}.`,
 
   // TODO: create a template for summarizing messages
 
-  dialogInitializationInstructionPromptTemplate: `
+  generalDialogInstructionPromptTemplate: `
 ### Your Persona:
 {{PERSONA_DESCRIPTION}}
 
@@ -69,7 +65,7 @@ Here is the summaries of messages:
 
 
 ### Last message of {{USER_NAME}}:
-{{CHAT_MESSAGE}}
+{{LAST_CHAT_MESSAGE}}
 
 
 From now on, you respond ONLY with messages of {{PERSONA_NAME}}.`
