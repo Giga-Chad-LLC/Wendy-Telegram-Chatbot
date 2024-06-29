@@ -1,5 +1,5 @@
 import { PrismaClient, User } from '@prisma/client';
-import { IByUserIdSearchableRepository, IRepository } from './Repositories';
+import { IRepository } from './Repositories';
 
 
 export class UserRepository implements IRepository<User> {
