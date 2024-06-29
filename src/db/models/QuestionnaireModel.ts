@@ -1,4 +1,5 @@
 import { IPromptifiable } from '../../app/actions/IPromptifiable';
+import { Questionnaire } from '@prisma/client';
 
 export type QuestionnaireModelDto = {
   readonly preferredName: string;
@@ -9,21 +10,23 @@ export type QuestionnaireModelDto = {
   readonly bio: string;
 }
 
-export type QuestionnaireModelParams = {
-  id: number;
-  userId: number;
-  dto: QuestionnaireModelDto;
-}
 
 export class QuestionnaireModel implements IPromptifiable {
   readonly id: number;
   readonly userId: number;
   dto: QuestionnaireModelDto;
 
-  constructor({ id, userId, dto }: QuestionnaireModelParams) {
-    this.id = id;
-    this.userId = userId;
-    this.dto = dto;
+  constructor(questionnaire: Questionnaire) {
+    this.id = questionnaire.id;
+    this.userId = questionnaire.userId;
+    this.dto = {
+      preferredName: questionnaire.preferredName,
+      isAdult: questionnaire.isAdult,
+      age: questionnaire.age,
+      residenceCountry: questionnaire.residenceCountry,
+      residenceCity: questionnaire.residenceCity,
+      bio: questionnaire.bio,
+    };
   }
 
   /**

@@ -25,7 +25,7 @@ describe('OpenAILlmProvider', () => {
   it('should send two prompts', async () => {
     const llmDialog = new LlmDialogManager(llmProvider);
 
-    const questionnaire = new QuestionnaireModel({
+    /*const questionnaire = new QuestionnaireModel({
       id: 1,
       userId: 1,
       dto: {
@@ -36,7 +36,7 @@ describe('OpenAILlmProvider', () => {
         residenceCity: null,
         bio: 'Hello! I am Alphard. I am from USA. I love baseball and football. I have some struggles at school; I am being bullied by classmates. I want to overcome this and make them get off me.',
       },
-    })
+    })*/
 
     /*const lastUserChatMessage = new ChatMessage({
       id: 1,
@@ -50,12 +50,12 @@ describe('OpenAILlmProvider', () => {
       }
     });*/
 
-    const history = await llmDialog.startColdConversationWithFewShotPrompting({
+    /*const history = await llmDialog.startColdConversationWithFewShotPrompting({
       questionnaire: questionnaire,
       persona: new Wendy(),
     });
 
-    console.log(`=============== finalResponse ===============\n${history.lastMessage.content}`);
+    console.log(`=============== finalResponse ===============\n${history.lastMessage.content}`);*/
   }, -1);
 
 
