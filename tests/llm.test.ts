@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { OpenAILlmProvider } from '../src/app/llm/providers/OpenAILlmProvider';
+import { QuestionnaireModel } from '../src/db/models/QuestionnaireModel';
 import { LlmDialogManager } from '../src/app/llm/conversation/LlmDialogManager';
 import { LlmChatMessageRole } from '../src/app/llm/providers/LlmProvider';
+import { Wendy } from '../src/app/llm/prompt/configs/Personas';
+import { LlmDialogController } from '../src/controllers/LlmDialogController';
 
 
 describe('OpenAILlmProvider', () => {
@@ -68,5 +71,15 @@ describe('OpenAILlmProvider', () => {
     const tokensCount = llmProvider.countTextTokens("Hello! my name is Fred. I want to become your friend!");
     console.log(`Tokens count: ${tokensCount}`);
     expect(tokensCount).toBeGreaterThanOrEqual(0);
+  });
+
+  it('Try to converse with LLM via LlmDialogController API', async() => {
+    const llmDialogManager = new LlmDialogManager(llmProvider);
+    const controller = new LlmDialogController(llmDialogManager);
+
+    await controller.converse({
+      lastUserMessage: 'Hello! Tell me a bit about yourself. I want to make friends with you!',
+      userId: 1,
+    });
   });
 });
