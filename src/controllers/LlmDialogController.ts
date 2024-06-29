@@ -16,6 +16,11 @@ import {
   TwoMessageHistoryConstructionPolicy,
 } from '../app/llm/conversation/policies/IHistoryConstructionPolicies';
 
+export type ColdConversationStartParams = {
+  userId: number;
+  persona: Persona;
+};
+
 export type ConversationContinuationParams = {
   lastUserMessageContent: string;
   userId: number;
@@ -24,8 +29,6 @@ export type ConversationContinuationParams = {
 
 
 export class LlmDialogController {
-  // TODO: also create method for few-short prompting `startVeryFirstDialog() { ... }`
-
   private readonly llmDialogManager: LlmDialogManager;
   private readonly historyConstructionPolicy: IHistoryConstructionPolicy;
 
@@ -47,6 +50,23 @@ export class LlmDialogController {
       llmDialogManager: this.llmDialogManager,
     });
   }
+
+  async startColdConversation({ userId, persona }: ColdConversationStartParams) {
+    // retrieve data required for the system prompt
+    const questionnaire = (await this.questionnaireRepository.getByUserId(userId));
+
+    // user has not filled out the questionnaire => no LLM interaction allowed
+    if (!questionnaire) {
+      throw new ApplicationError(`User with id ${userId} did not fill out the questionnaire`);
+    }
+
+    const history = await this.llmDialogManager.startColdConversationWithFewShotPrompting({
+      questionnaire: new QuestionnaireModel(questionnaire),
+      persona,
+    });
+  }
+
+  // TODO: comment all!
 
   async converse({ lastUserMessageContent, userId, persona }: ConversationContinuationParams) {
     // retrieve data required for the system prompt
