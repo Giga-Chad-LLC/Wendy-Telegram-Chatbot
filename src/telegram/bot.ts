@@ -10,23 +10,8 @@ const bot = new Telegraf(BOT_TOKEN!);
     ctx.reply(`Hello, ${firstName}!`);
   });
 
-  bot.command('admin', async (ctx) => {
-    return ctx.reply(
-      'open webapp',
-      Markup.keyboard([
-        Markup.button.webApp(
-          'Admin panel',
-          'https://bagi4-source.github.io/Wendy-WebApp/',
-        ),
-      ]),
-    );
-  });
-
-  bot.on(message('web_app_data'), async (ctx) => {
-    if (!ctx.webAppData) return;
-    const data = ctx.webAppData.data.json();
-    const text = ctx.webAppData.data.text();
-    console.log(data, text);
+  bot.on(message(), (ctx) => {
+    ctx.reply(`Вацок, ты че-то совсем не чувствуешь!`);
   });
 
   bot.help((ctx) => ctx.reply('Send me a sticker'));
