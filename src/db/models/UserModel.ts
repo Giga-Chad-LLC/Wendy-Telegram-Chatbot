@@ -1,5 +1,5 @@
 
-export type UserDto = {
+export type UserModelDto = {
   readonly telegramFirstName: string;
   readonly telegramLastName: string;
   readonly telegramUserId: string;
@@ -7,16 +7,16 @@ export type UserDto = {
   readonly since: Date;
 }
 
-export type UserParams = {
+export type UserModelParams = {
   id: number;
-  dto: UserDto;
+  dto: UserModelDto;
 }
 
-export class User {
+export class UserModel {
   readonly id: number;
-  readonly dto: UserDto;
+  readonly dto: UserModelDto;
 
-  constructor({ id, dto }: UserParams) {
+  constructor({ id, dto }: UserModelParams) {
     this.id = id;
     this.dto = dto;
   }
