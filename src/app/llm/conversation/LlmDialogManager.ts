@@ -42,7 +42,7 @@ export class LlmDialogManager {
   async startColdConversationWithFewShotPrompting({
     questionnaire,
     persona,
-  }: ColdConversationParams): Promise<LlmChatHistory> {
+  }: ColdConversationParams): Promise<AssistantLlmChatMessage> {
     try {
       const conversationExample = await this.createAuxiliaryConversationExample(questionnaire, persona);
       console.log(`=============== conversationExample ===============\n${conversationExample}`)
@@ -58,20 +58,13 @@ export class LlmDialogManager {
 
       // contains answer of persona that should be sent in user's chat
       const llmResponseMessage = await this.llmProvider.sendMessage(initialInstructionPrompt);
-      const assistantMessage = new AssistantLlmChatMessage(llmResponseMessage);
-
-      return new Promise((resolve, _) => {
-        const history = new LlmChatHistory({
-          messages: [ assistantMessage ],
-          initialSystemPrompt: new SystemLlmChatMessage(initialInstructionPrompt),
-          lastMessage: assistantMessage,
-        });
-
-        resolve(history);
-      });
+      return new Promise((resolve, _) => resolve(new AssistantLlmChatMessage(llmResponseMessage)));
     }
     catch (error) {
-      return new Promise((_, reject) => reject(error));
+      return new Promise((_, reject) => {
+        const applicationError = new ApplicationError('Cannot request LLM for the response', error as Error);
+        reject(applicationError);
+      });
     }
   }
 
@@ -111,25 +104,17 @@ export class LlmDialogManager {
 
   // TODO: caller should update history before calling this method (write javadoc)
   // TODO: we should store last system message in database as well?
-  async converse({ history }: GeneralConversationParams): Promise<LlmChatHistory> {
+  async converse({ history }: GeneralConversationParams): Promise<AssistantLlmChatMessage> {
     this.checkTokenLimit([ history.initialSystemPrompt, ...history.messages ]);
 
     try {
-      const llmResponse = await this.llmProvider.sendMessages([
+      const llmResponseMessage = await this.llmProvider.sendMessages([
         history.initialSystemPrompt, ...history.messages
       ]);
-      const assistantMessage = new AssistantLlmChatMessage(llmResponse);
-
-      const updatedHistory = new LlmChatHistory({
-        messages: [...history.messages, assistantMessage],
-        initialSystemPrompt: history.initialSystemPrompt,
-        lastMessage: assistantMessage,
-      });
-
-      return new Promise((resolve, _) => resolve(updatedHistory));
+      return new Promise<AssistantLlmChatMessage>((resolve, _) => resolve(new AssistantLlmChatMessage(llmResponseMessage)));
     }
     catch (error) {
-      return new Promise((_, reject) => {
+      return new Promise<AssistantLlmChatMessage>((_, reject) => {
         reject(new ApplicationError("Conversation attempt failed", error as Error));
       });
     }
@@ -178,5 +163,4 @@ export class LlmDialogManager {
     const currentTokenNumber = this.llmProvider.countMessagesTokens(messages);
     return (currentTokenNumber > limit);
   }
-
 }

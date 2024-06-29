@@ -4,7 +4,7 @@ import { ChatMessageRepository } from '../db/repositories/ChatMessageRepository'
 import { LlmDialogManager } from '../app/llm/conversation/LlmDialogManager';
 import { LlmChatHistory } from '../app/llm/conversation/LlmChatHistory';
 import { ChatMessageModel } from '../db/models/ChatMessageModel';
-import { SystemLlmChatMessage, UserLlmChatMessage } from '../app/llm/providers/LlmProvider';
+import { AssistantLlmChatMessage, SystemLlmChatMessage, UserLlmChatMessage } from '../app/llm/providers/LlmProvider';
 import { QuestionnaireRepository } from '../db/repositories/QuestionnaireRepository';
 import { QuestionnaireModel } from '../db/models/QuestionnaireModel';
 import { Persona, Wendy } from '../app/llm/prompt/configs/Personas';
@@ -51,7 +51,8 @@ export class LlmDialogController {
     });
   }
 
-  async startColdConversation({ userId, persona }: ColdConversationStartParams) {
+
+  async converseCold({ userId, persona }: ColdConversationStartParams): Promise<AssistantLlmChatMessage> {
     // retrieve data required for the system prompt
     const questionnaire = (await this.questionnaireRepository.getByUserId(userId));
 
@@ -60,15 +61,20 @@ export class LlmDialogController {
       throw new ApplicationError(`User with id ${userId} did not fill out the questionnaire`);
     }
 
-    const history = await this.llmDialogManager.startColdConversationWithFewShotPrompting({
-      questionnaire: new QuestionnaireModel(questionnaire),
-      persona,
-    });
+    const assistantLlmChatMessage = await this.llmDialogManager
+      .startColdConversationWithFewShotPrompting({
+        questionnaire: new QuestionnaireModel(questionnaire),
+        persona,
+      });
+
+    // TODO: save into DB assistantLlmChatMessage
+
+    return new Promise<AssistantLlmChatMessage>((resolve, _) => resolve(assistantLlmChatMessage));
   }
 
   // TODO: comment all!
 
-  async converse({ lastUserMessageContent, userId, persona }: ConversationContinuationParams) {
+  async converse({ lastUserMessageContent, userId, persona }: ConversationContinuationParams): Promise<AssistantLlmChatMessage> {
     // retrieve data required for the system prompt
     const questionnaire = (await this.questionnaireRepository.getByUserId(userId));
 
@@ -90,10 +96,13 @@ export class LlmDialogController {
     console.log(`User's Last Message:\n"""${constructedHistory.lastMessage.content}\n"""`)
 
     // use current history to make conversation prompts
-    // TODO: we need only LLM response message, it'll be saved into DB, no need in entire history
-    const historyWithLlmResponse = await this.llmDialogManager.converse({ history: constructedHistory });
+    const assistantLlmChatMessage = await this.llmDialogManager
+      .converse({ history: constructedHistory });
+
+    console.log(`Last LLM Message: "${assistantLlmChatMessage.content}"`);
 
     // TODO(vartiukhov): [IMPORTANT] save LLM response from updatedHistory into database
-    console.log(`Last LLM Message: "${historyWithLlmResponse.lastMessage.content}"`);
+
+    return new Promise<AssistantLlmChatMessage>((resolve, _) => resolve(assistantLlmChatMessage));
   }
 }

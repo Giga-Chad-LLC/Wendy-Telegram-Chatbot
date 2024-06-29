@@ -73,15 +73,31 @@ describe('OpenAILlmProvider', () => {
     expect(tokensCount).toBeGreaterThanOrEqual(0);
   });
 
-  it('Try to converse with LLM via LlmDialogController API', async() => {
+
+  it('cold converse with LLM via LlmDialogController API', async() => {
     const llmDialogManager = new LlmDialogManager(llmProvider);
     const controller = new LlmDialogController(llmDialogManager);
 
-    await controller.converse({
+    const assistantMessage = await controller.converseCold({
+      userId: 1,
+      persona: new Wendy(),
+    });
+
+    console.log(assistantMessage.content);
+  }, -1);
+
+
+  it('converse with LLM via LlmDialogController API', async() => {
+    const llmDialogManager = new LlmDialogManager(llmProvider);
+    const controller = new LlmDialogController(llmDialogManager);
+
+    const assistantMessage = await controller.converse({
       lastUserMessageContent: 'Hello! Tell me a bit about yourself. I want to make friends with you!',
       userId: 1,
       persona: new Wendy(),
     });
+
+    console.log(assistantMessage.content);
   }, -1);
 
 });

@@ -13,6 +13,7 @@ export interface IMessagesSplitPolicy {
 
 
 // implementations
+
 export class MessagesSplitByHalfPolicy implements IMessagesSplitPolicy {
   split(messages: ChatMessage[]): SplitResult {
     const { firstGroup, secondGroup  } = sliceArrayInGroupsByK(
