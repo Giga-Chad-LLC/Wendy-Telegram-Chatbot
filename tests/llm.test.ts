@@ -57,7 +57,13 @@ describe('OpenAILlmProvider', () => {
 
 
   it('count tokens from messages', async () => {
-    const tokensCount = llmProvider.countTokens([{ role: LlmChatMessageRole.USER, content: "Hello! my name is Fred. I want to become your friend!" }]);
+    const tokensCount = llmProvider.countMessagesTokens([{ role: LlmChatMessageRole.USER, content: "Hello! my name is Fred. I want to become your friend!" }]);
+    console.log(`Tokens count: ${tokensCount}`);
+    expect(tokensCount).toBeGreaterThanOrEqual(0);
+  });
+
+  it('count tokens from text', async () => {
+    const tokensCount = llmProvider.countTextTokens("Hello! my name is Fred. I want to become your friend!");
     console.log(`Tokens count: ${tokensCount}`);
     expect(tokensCount).toBeGreaterThanOrEqual(0);
   });

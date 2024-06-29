@@ -18,6 +18,7 @@ export type LlmChatMessage = {
 export interface LlmProvider {
   sendMessage(message: string): Promise<string>;
   sendMessages(messages: LlmChatMessage[]): Promise<string>;
-  countTokens(messages: LlmChatMessage[]): number;
+  countMessagesTokens(messages: LlmChatMessage[]): number;
+  countTextTokens(text: string): number;
 }
 

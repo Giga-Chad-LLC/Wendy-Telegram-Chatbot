@@ -44,7 +44,24 @@ export class OpenAILlmProvider implements LlmProvider {
     }
   }
 
-  countTokens(messages: LlmChatMessage[]): number {
+  countTextTokens(text: string): number {
+    let enc: tiktoken.Tiktoken | null = null;
+    try {
+      enc = tiktoken.encoding_for_model(this.model as TiktokenModel);
+      return enc!.encode(text).length;
+    }
+    catch (error) {
+      console.error(error);
+      throw new ApplicationError("Cannot encode text and count tokens number", error as Error);
+    }
+    finally {
+      if (enc) {
+        enc.free();
+      }
+    }
+  }
+
+  countMessagesTokens(messages: LlmChatMessage[]): number {
     let enc: tiktoken.Tiktoken | null = null;
     try {
       enc = tiktoken.encoding_for_model(this.model as TiktokenModel);
