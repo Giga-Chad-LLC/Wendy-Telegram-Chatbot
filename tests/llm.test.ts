@@ -74,7 +74,7 @@ describe('OpenAILlmProvider', () => {
   });
 
 
-  it('cold converse with LLM via LlmDialogController API', async() => {
+  it('cold converse with LLM', async() => {
     const llmDialogManager = new LlmDialogManager(llmProvider);
     const controller = new LlmDialogController(llmDialogManager);
 
@@ -87,7 +87,7 @@ describe('OpenAILlmProvider', () => {
   }, -1);
 
 
-  it('converse with LLM via LlmDialogController API', async() => {
+  it('converse with LLM', async() => {
     const llmDialogManager = new LlmDialogManager(llmProvider);
     const controller = new LlmDialogController(llmDialogManager);
 

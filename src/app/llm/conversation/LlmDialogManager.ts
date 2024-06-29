@@ -130,7 +130,7 @@ export class LlmDialogManager {
         .build();
 
       const summary = await this.llmProvider.sendMessage(constructSummaryInstructionPrompt);
-      console.log(`Message Summary: \n'''${summary}\n'''`);
+      console.log(`Message Summary:\n'''\n${summary}\n'''`);
 
       return new Promise<string>((resolve, _) => resolve(summary));
     }
