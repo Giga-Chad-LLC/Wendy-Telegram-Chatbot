@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "bot": "ts-node src/telegram/bot.ts",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "vitest",
     "run": "npx ts-node ./src/index.ts"
@@ -27,6 +28,7 @@
   },
   "dependencies": {
     "@prisma/client": "^5.16.1",
+    "env-var": "^7.5.0",
     "openai": "^4.52.1",
     "prisma": "^5.16.1",
     "telegraf": "^4.16.3",
