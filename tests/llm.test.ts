@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { OpenAILlmProvider } from '../src/app/llm/providers/OpenAILlmProvider';
-import { Questionnaire } from '../src/db/models/Questionnaire';
+import { QuestionnaireModel } from '../src/db/models/QuestionnaireModel';
 import { LlmDialogManager } from '../src/app/llm/conversation/LlmDialogManager';
 import { LlmChatMessageRole } from '../src/app/llm/providers/LlmProvider';
 import { Wendy } from '../src/app/llm/prompt/configs/Personas';
@@ -25,7 +25,7 @@ describe('OpenAILlmProvider', () => {
   it('should send two prompts', async () => {
     const llmDialog = new LlmDialogManager(llmProvider);
 
-    const questionnaire = new Questionnaire({
+    const questionnaire = new QuestionnaireModel({
       id: 1,
       userId: 1,
       dto: {

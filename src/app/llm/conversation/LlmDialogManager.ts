@@ -1,5 +1,5 @@
 import { AssistantLlmChatMessage, LlmProvider, SystemLlmChatMessage } from '../providers/LlmProvider';
-import { Questionnaire } from '../../../db/models/Questionnaire';
+import { QuestionnaireModel } from '../../../db/models/QuestionnaireModel';
 import { promptTemplates } from '../../prompting/PromptTemplates';
 import { PromptTemplate, PromptTemplateVariables } from '../prompt/template/PromptTemplate';
 import { Persona } from '../prompt/configs/Personas';
@@ -14,7 +14,7 @@ import { ChatMessageModel } from '../../../db/models/ChatMessageModel';
 
 
 export type ColdConversationParams = {
-  questionnaire: Questionnaire,
+  questionnaire: QuestionnaireModel,
   persona: Persona,
 }
 
@@ -24,7 +24,7 @@ export type GeneralConversationParams = {
 
 
 export type CreateGeneralDialogInstructionPromptParams = {
-  questionnaire: Questionnaire,
+  questionnaire: QuestionnaireModel,
   messagesToSummarize: ChatMessageModel[],
   recentMessages: ChatMessageModel[],
   lastUserMessage: ChatMessageModel,
@@ -76,7 +76,7 @@ export class LlmDialogManager {
   }
 
 
-  private async createAuxiliaryConversationExample(questionnaire: Questionnaire, persona: Persona): Promise<string> {
+  private async createAuxiliaryConversationExample(questionnaire: QuestionnaireModel, persona: Persona): Promise<string> {
     try {
       const buildExampleConversationPrompt = new PromptTemplate(promptTemplates.buildExampleConversationPromptTemplate)
         .set(PromptTemplateVariables.PERSONA_DESCRIPTION, persona.description)

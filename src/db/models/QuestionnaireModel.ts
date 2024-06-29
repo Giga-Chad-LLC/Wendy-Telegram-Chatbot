@@ -1,6 +1,6 @@
 import { IPromptifiable } from '../../app/actions/IPromptifiable';
 
-export type QuestionnaireDto = {
+export type QuestionnaireModelDto = {
   readonly preferredName: string;
   readonly isAdult: boolean;
   readonly age: number | null;
@@ -9,18 +9,18 @@ export type QuestionnaireDto = {
   readonly bio: string;
 }
 
-export type QuestionnaireParams = {
+export type QuestionnaireModelParams = {
   id: number;
   userId: number;
-  dto: QuestionnaireDto;
+  dto: QuestionnaireModelDto;
 }
 
-export class Questionnaire implements IPromptifiable {
+export class QuestionnaireModel implements IPromptifiable {
   readonly id: number;
   readonly userId: number;
-  dto: QuestionnaireDto;
+  dto: QuestionnaireModelDto;
 
-  constructor({ id, userId, dto }: QuestionnaireParams) {
+  constructor({ id, userId, dto }: QuestionnaireModelParams) {
     this.id = id;
     this.userId = userId;
     this.dto = dto;
