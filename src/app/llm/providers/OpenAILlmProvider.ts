@@ -16,6 +16,11 @@ export class OpenAILlmProvider implements LlmProvider {
     this.model = model
   }
 
+  // TODO: dynamically identify token limits based on model
+  getTokenLimit(): number {
+    return 128_000;
+  }
+
   async sendMessage(message: string): Promise<string> {
     return this.sendMessages([{
       role: LlmChatMessageRole.USER,
