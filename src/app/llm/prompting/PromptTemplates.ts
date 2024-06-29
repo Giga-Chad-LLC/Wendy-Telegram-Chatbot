@@ -10,7 +10,7 @@ export const promptTemplates = {
 
 
 ### About conversation partner: 
-You are talking with a person named {{USER_NAME}}. Here is her summary:
+You are talking with a person named {{USER_NAME}}. Here is information about them:
 {{QUESTIONNAIRE}}
 
 
@@ -27,7 +27,7 @@ You are talking with a person named {{USER_NAME}}. Here is her summary:
 
 
 ### About conversation partner: 
-You are talking with a person named {{USER_NAME}}. Here is her summary:
+You are talking with a person named {{USER_NAME}}. Here is information about them:
 {{QUESTIONNAIRE}}
 
 
@@ -50,7 +50,7 @@ From now on, you respond ONLY with messages of {{PERSONA_NAME}}.`,
 
 
 ### About conversation partner: 
-You are talking with a person named {{USER_NAME}}. Here is her summary:
+You are talking with a person named {{USER_NAME}}. Here is information about them:
 {{QUESTIONNAIRE}}
 
 
