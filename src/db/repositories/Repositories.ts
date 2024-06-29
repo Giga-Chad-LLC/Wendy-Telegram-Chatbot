@@ -15,6 +15,10 @@ export interface IByIdRetrievableRepository<T> {
   getById(id: number): Promise<T | null>;
 }
 
-export interface IByUserIdRetrievableRepository<T> {
+export interface IByUserIdManyRetrievableRepository<T> {
   getUserById(id: number): Promise<T[] | null>;
+}
+
+export interface IByUserIdUniqueRetrievableRepository<T> {
+  getUserById(id: number): Promise<T | null>;
 }

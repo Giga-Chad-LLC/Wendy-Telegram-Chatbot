@@ -1,5 +1,5 @@
 import { PrismaClient, ChatMessage } from '@prisma/client';
-import { IByUserIdRetrievableRepository, IRepository } from './Repositories';
+import { IByUserIdManyRetrievableRepository, IRepository } from './Repositories';
 
 
 export type PaginatedSortedMessagesParams = {
@@ -10,7 +10,8 @@ export type PaginatedSortedMessagesParams = {
   limit: number;
 }
 
-export class ChatMessageRepository implements IRepository<ChatMessage>, IByUserIdRetrievableRepository<ChatMessage> {
+// TODO: is it ok to have prisma as field?
+export class ChatMessageRepository implements IRepository<ChatMessage>, IByUserIdManyRetrievableRepository<ChatMessage> {
   private readonly prisma = new PrismaClient();
 
   create(data: Omit<ChatMessage, "id">): Promise<ChatMessage> {
