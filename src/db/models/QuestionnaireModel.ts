@@ -2,6 +2,7 @@ import { IPromptifiable } from '../../app/actions/IPromptifiable';
 import { Questionnaire } from '@prisma/client';
 
 export type QuestionnaireModelDto = {
+  readonly userId: number;
   readonly preferredName: string;
   readonly isAdult: boolean;
   readonly age: number | null;
@@ -13,13 +14,12 @@ export type QuestionnaireModelDto = {
 
 export class QuestionnaireModel implements IPromptifiable {
   readonly id: number;
-  readonly userId: number;
   dto: QuestionnaireModelDto;
 
   constructor(questionnaire: Questionnaire) {
     this.id = questionnaire.id;
-    this.userId = questionnaire.userId;
     this.dto = {
+      userId: questionnaire.userId,
       preferredName: questionnaire.preferredName,
       isAdult: questionnaire.isAdult,
       age: questionnaire.age,
