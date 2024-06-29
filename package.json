@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "api": "ts-node src/api/main.ts",
     "bot": "ts-node src/telegram/bot.ts",
+    "prisma:generate": "prisma generate --schema=./prisma/schema.prisma",
+    "prisma:migrate": "prisma migrate deploy --schema=./prisma/schema.prisma",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "vitest",
     "run": "npx ts-node ./src/index.ts",
@@ -14,6 +17,7 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/express": "^4.17.21",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.14.9",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
@@ -30,6 +34,8 @@
   "dependencies": {
     "@prisma/client": "^5.16.1",
     "env-var": "^7.5.0",
+    "express": "^4.19.2",
+    "express-validator": "^7.1.0",
     "openai": "^4.52.1",
     "prisma": "^5.16.1",
     "telegraf": "^4.16.3",
