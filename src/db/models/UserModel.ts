@@ -1,3 +1,4 @@
+import { User } from '@prisma/client';
 
 export type UserModelDto = {
   readonly telegramFirstName: string;
@@ -7,17 +8,18 @@ export type UserModelDto = {
   readonly since: Date;
 }
 
-export type UserModelParams = {
-  id: number;
-  dto: UserModelDto;
-}
-
 export class UserModel {
   readonly id: number;
   readonly dto: UserModelDto;
 
-  constructor({ id, dto }: UserModelParams) {
-    this.id = id;
-    this.dto = dto;
+  constructor(user: User) {
+    this.id = user.id;
+    this.dto = {
+      telegramFirstName: user.telegramFirstName,
+      telegramLastName: user.telegramLastName,
+      telegramUserId: user.telegramUserId,
+      telegramChatId: user.telegramChatId,
+      since: user.since,
+    };
   }
 }
