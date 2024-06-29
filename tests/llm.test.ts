@@ -4,6 +4,7 @@ import { Questionnaire } from '../src/db/models/Questionnaire';
 import { LlmDialog } from '../src/app/llm/conversation/LlmDialog';
 import { ChatMessage, ChatMessageRole } from '../src/db/models/ChatMessage';
 import { LlmChatMessageRole } from '../src/app/llm/providers/LlmProvider';
+import { Wendy } from '../src/app/llm/prompt/configs/Personas';
 
 
 describe('OpenAILlmProvider', () => {
@@ -50,7 +51,11 @@ describe('OpenAILlmProvider', () => {
       }
     });
 
-    const response = await llmDialog.startColdConversationWithFewShotPrompting(lastUserChatMessage.dto.text, questionnaire);
+    const response = await llmDialog.startColdConversationWithFewShotPrompting({
+      lastUserChatMessage: lastUserChatMessage.dto.text,
+      questionnaire: questionnaire,
+      persona: new Wendy(),
+    });
 
     console.log(`=============== finalResponse ===============\n${response}`);
   }, -1);

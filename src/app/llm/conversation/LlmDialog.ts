@@ -2,7 +2,7 @@ import { LlmProvider } from '../providers/LlmProvider';
 import { Questionnaire } from '../../../db/models/Questionnaire';
 import { promptTemplates } from '../../prompting/PromptTemplates';
 import { PromptTemplate, PromptTemplateVariables } from '../prompt/template/PromptTemplate';
-import { Wendy } from '../prompt/configs/Personas';
+import { Persona, Wendy } from '../prompt/configs/Personas';
 import {
   buildExampleConversationInstruction,
   converseWithPartnerAccordingToPersonaInstruction,
@@ -11,6 +11,18 @@ import { LlmRegex } from '../../regex/llmRegex';
 import { ChatMessage } from '../../../db/models/ChatMessage';
 
 
+export type ColdConversationParams = {
+  lastUserChatMessage: string,
+  questionnaire: Questionnaire,
+  persona: Persona,
+}
+
+// export type GeneralConversationParams = {
+//   lastUserChatMessage: string,
+//   questionnaire: Questionnaire,
+//   persona: Persona,
+//   lastMessages: string[]
+// }
 
 export class LlmDialog {
   private llmProvider: LlmProvider
@@ -19,17 +31,18 @@ export class LlmDialog {
     this.llmProvider = llmProvider;
   }
 
-  async startColdConversationWithFewShotPrompting(
-    lastUserChatMessage: string,
-    questionnaire: Questionnaire,
-  ): Promise<string> {
+  async startColdConversationWithFewShotPrompting({
+    lastUserChatMessage,
+    questionnaire,
+    persona,
+  }: ColdConversationParams): Promise<string> {
     try {
-      const conversationExample = await this.createAuxiliaryConversationExample(questionnaire);
+      const conversationExample = await this.createAuxiliaryConversationExample(questionnaire, persona);
       console.log(`=============== conversationExample ===============\n${conversationExample}`)
 
       const initialInstructionPrompt = new PromptTemplate(promptTemplates.coldConversationStartInstructionPromptTemplate)
-        .set(PromptTemplateVariables.PERSONA_DESCRIPTION, Wendy.description)
-        .set(PromptTemplateVariables.PERSONA_NAME, Wendy.personaName)
+        .set(PromptTemplateVariables.PERSONA_DESCRIPTION, persona.description)
+        .set(PromptTemplateVariables.PERSONA_NAME, persona.personaName)
         .set(PromptTemplateVariables.INSTRUCTION, converseWithPartnerAccordingToPersonaInstruction.instruction)
         .set(PromptTemplateVariables.QUESTIONNAIRE, questionnaire.promptify())
         .set(PromptTemplateVariables.CONVERSATION_EXAMPLE, conversationExample)
@@ -47,10 +60,10 @@ export class LlmDialog {
 
   }
 
-  private async createAuxiliaryConversationExample(questionnaire: Questionnaire): Promise<string> {
+  private async createAuxiliaryConversationExample(questionnaire: Questionnaire, persona: Persona): Promise<string> {
     try {
       const buildExampleConversationPrompt = new PromptTemplate(promptTemplates.buildExampleConversationPromptTemplate)
-        .set(PromptTemplateVariables.PERSONA_DESCRIPTION, Wendy.description)
+        .set(PromptTemplateVariables.PERSONA_DESCRIPTION, persona.description)
         .set(PromptTemplateVariables.INSTRUCTION, buildExampleConversationInstruction.instruction)
         .set(PromptTemplateVariables.QUESTIONNAIRE, questionnaire.promptify())
         .set(PromptTemplateVariables.USER_NAME, questionnaire.dto.preferredName)
@@ -78,5 +91,9 @@ export class LlmDialog {
       return new Promise<string>((_, reject) => reject(error));
     }
   }
+
+  // async converse() {
+  //
+  // }
 }
 
