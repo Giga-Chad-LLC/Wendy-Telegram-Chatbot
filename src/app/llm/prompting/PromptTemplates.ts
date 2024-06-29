@@ -38,7 +38,17 @@ Here is an example of possible conversation between {{PERSONA_NAME}} and {{USER_
 
 From now on, you respond ONLY with messages of {{PERSONA_NAME}}.`,
 
-  // TODO: create a template for summarizing messages
+  messageSummaryCreationInstructionPromptTemplate: `
+### Instruction:
+{{INSTRUCTION}}
+
+
+### Message to summarize:
+{{LAST_CHAT_MESSAGE}}
+
+
+### Output Format:
+{{OUTPUT_FORMAT}}`,
 
   generalDialogInstructionPromptTemplate: `
 ### Your Persona:
