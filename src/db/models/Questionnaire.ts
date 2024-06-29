@@ -1,3 +1,4 @@
+import { IPromptifiable } from '../../app/actions/IPromptifiable';
 
 export type QuestionnaireDto = {
   readonly preferredName: string;
@@ -14,7 +15,7 @@ export type QuestionnaireParams = {
   dto: QuestionnaireDto;
 }
 
-export class Questionnaire {
+export class Questionnaire implements IPromptifiable {
   readonly id: number;
   readonly userId: number;
   dto: QuestionnaireDto;
