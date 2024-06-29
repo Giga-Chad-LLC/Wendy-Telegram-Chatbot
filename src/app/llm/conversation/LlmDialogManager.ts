@@ -1,26 +1,17 @@
-import {
-  AssistantLlmChatMessage,
-  LlmChatMessage,
-  LlmChatMessageRole,
-  LlmProvider,
-  SystemLlmChatMessage,
-} from '../providers/LlmProvider';
+import { AssistantLlmChatMessage, LlmProvider, SystemLlmChatMessage } from '../providers/LlmProvider';
 import { Questionnaire } from '../../../db/models/Questionnaire';
 import { promptTemplates } from '../../prompting/PromptTemplates';
 import { PromptTemplate, PromptTemplateVariables } from '../prompt/template/PromptTemplate';
-import { Persona, Wendy } from '../prompt/configs/Personas';
+import { Persona } from '../prompt/configs/Personas';
 import {
   buildExampleConversationInstruction,
   converseWithPartnerAccordingToPersonaInstruction,
 } from '../prompt/configs/Instructions';
 import { LlmRegex } from '../../regex/llmRegex';
 import { ApplicationError } from '../../errors/ApplicationError';
+import { LlmChatHistory } from './LlmChatHistory';
+import { ChatMessage } from '../../../db/models/ChatMessage';
 
-
-export type LlmChatHistory = {
-  messages: LlmChatMessage[],
-  lastMessage: LlmChatMessage,
-}
 
 export type ColdConversationParams = {
   questionnaire: Questionnaire,
@@ -29,6 +20,15 @@ export type ColdConversationParams = {
 
 export type GeneralConversationParams = {
   history: LlmChatHistory,
+}
+
+
+export type CreateGeneralDialogInstructionPromptParams = {
+  questionnaire: Questionnaire,
+  messagesToSummarize: ChatMessage[],
+  recentMessages: ChatMessage[],
+  lastUserMessage: ChatMessage,
+  persona: Persona,
 }
 
 
@@ -61,13 +61,11 @@ export class LlmDialogManager {
       const assistantMessage = new AssistantLlmChatMessage(llmResponseMessage);
 
       return new Promise((resolve, _) => {
-        const history: LlmChatHistory = {
-          messages: [
-            new SystemLlmChatMessage(initialInstructionPrompt),
-            assistantMessage,
-          ],
+        const history = new LlmChatHistory({
+          messages: [ assistantMessage ],
+          initialSystemPrompt: new SystemLlmChatMessage(initialInstructionPrompt),
           lastMessage: assistantMessage,
-        };
+        });
 
         resolve(history);
       });
@@ -120,10 +118,11 @@ export class LlmDialogManager {
       const llmResponse = await this.llmProvider.sendMessages(history.messages);
       const assistantMessage = new AssistantLlmChatMessage(llmResponse);
 
-      const updatedHistory: LlmChatHistory = {
+      const updatedHistory = new LlmChatHistory({
         messages: [...history.messages, assistantMessage],
+        initialSystemPrompt: history.initialSystemPrompt,
         lastMessage: assistantMessage,
-      };
+      });
 
       return new Promise((resolve, _) => resolve(updatedHistory));
     }
@@ -134,13 +133,49 @@ export class LlmDialogManager {
     }
   }
 
+
+  // TODO: move prompt construction variables into different class
+  createGeneralDialogInstructionPrompt({
+    questionnaire,
+    messagesToSummarize,
+    recentMessages,
+    lastUserMessage,
+    persona,
+  }: CreateGeneralDialogInstructionPromptParams): string {
+    const summarizedMessagesComponent = messagesToSummarize
+      .map(msg => msg.promptifyAsSummary())
+      .join('\n\n');
+
+    const recentMessagesComponent = recentMessages
+      .map(msg => msg.promptify())
+      .join('\n\n');
+
+    return new PromptTemplate(promptTemplates.generalDialogInstructionPromptTemplate)
+      .set(PromptTemplateVariables.PERSONA_DESCRIPTION, persona.description)
+      .set(PromptTemplateVariables.PERSONA_NAME, persona.personaName)
+      .set(PromptTemplateVariables.INSTRUCTION, converseWithPartnerAccordingToPersonaInstruction.instruction)
+      .set(PromptTemplateVariables.QUESTIONNAIRE, questionnaire.promptify())
+      .set(PromptTemplateVariables.SUMMARIZED_MESSAGES, summarizedMessagesComponent)
+      .set(PromptTemplateVariables.CONVERSATION_MESSAGES, recentMessagesComponent)
+      .set(PromptTemplateVariables.LAST_CHAT_MESSAGE, lastUserMessage.dto.text)
+      .set(PromptTemplateVariables.USER_NAME, questionnaire.dto.preferredName)
+      .build();
+  }
+
+
   private checkHistoryTokenLimit(history: LlmChatHistory) {
     const limit = this.llmProvider.getTokenLimit();
     const currentTokenNumber = this.llmProvider.countMessagesTokens(history.messages);
-
-    if (currentTokenNumber > limit) {
+    if (this.isTokenLimitExceeded(history)) {
       throw new ApplicationError(`History has ${currentTokenNumber} tokens and exceeds token limit of ${limit}`);
+
     }
   }
-}
 
+
+  isTokenLimitExceeded(history: LlmChatHistory): boolean {
+    const limit = this.llmProvider.getTokenLimit();
+    const currentTokenNumber = this.llmProvider.countMessagesTokens(history.messages);
+    return (currentTokenNumber > limit);
+  }
+}
