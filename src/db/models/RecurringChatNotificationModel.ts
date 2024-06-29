@@ -1,3 +1,4 @@
+import { RecurringChatNotification } from '@prisma/client';
 
 
 export type RecurringChatNotificationModelDto = {
@@ -5,17 +6,16 @@ export type RecurringChatNotificationModelDto = {
   dayTimepoint: number;
 }
 
-export type RecurringChatNotificationModelParams = {
-  id: number;
-  dto: RecurringChatNotificationModelDto;
-}
 
 export class RecurringChatNotificationModel {
   readonly id: number;
   readonly dto: RecurringChatNotificationModelDto;
 
-  constructor({ id, dto }: RecurringChatNotificationModelParams) {
-    this.id = id;
-    this.dto = dto;
+  constructor(notification: RecurringChatNotification) {
+    this.id = notification.id;
+    this.dto = {
+      userId: notification.userId,
+      dayTimepoint: notification.dayTimepoint,
+    };
   }
 }
