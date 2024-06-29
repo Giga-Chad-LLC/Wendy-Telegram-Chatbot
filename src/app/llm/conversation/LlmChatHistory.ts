@@ -15,9 +15,9 @@ export class LlmChatHistory {
   readonly lastMessage: LlmChatMessage;
 
   /**
-   * @param messages messages <b>must NOT</b> contain the initial system prompt, use `initialSystemPrompt` to store it
-   * @param initialSystemPrompt initial system prompt sent to LLM at the beginning of the conversation
-   * @param lastMessage last message (either user's or assistant's) sent in a LLM chat
+   * @param messages messages <b>must NOT</b> contain the initial system prompt, use `initialSystemPrompt` to store it.
+   * @param initialSystemPrompt initial system prompt sent to LLM at the beginning of the conversation.
+   * @param lastMessage last message (either user's or assistant's) sent in a LLM chat, it MUST be inserted into `messages` as well.
    */
   constructor({ messages, initialSystemPrompt, lastMessage }: LlmChatHistoryParams) {
     this.messages = messages;
