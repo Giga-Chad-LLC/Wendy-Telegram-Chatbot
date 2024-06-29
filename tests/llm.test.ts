@@ -1,9 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { OpenAILlmProvider } from '../src/app/llm/providers/OpenAILlmProvider';
-import { QuestionnaireModel } from '../src/db/models/QuestionnaireModel';
 import { LlmDialogManager } from '../src/app/llm/conversation/LlmDialogManager';
 import { LlmChatMessageRole } from '../src/app/llm/providers/LlmProvider';
-import { Wendy } from '../src/app/llm/prompt/configs/Personas';
 
 
 describe('OpenAILlmProvider', () => {
@@ -22,6 +20,7 @@ describe('OpenAILlmProvider', () => {
     expect(response).not.toBe('');
   });
 
+  // TODO: adjust to make work (need access DB)
   it('should send two prompts', async () => {
     const llmDialog = new LlmDialogManager(llmProvider);
 
