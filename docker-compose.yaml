@@ -29,7 +29,8 @@ services:
       - .env
     ports:
       - '3000:3000'
-    command: npm run api
+    command: -c "npm run api"
+    tty: true
     depends_on:
       - postgres
 
@@ -38,7 +39,8 @@ services:
     container_name: bot
     env_file:
       - .env
-    command: npm run bot
+    command: -c "npm run bot"
+    tty: true
     depends_on:
       - postgres
 
