@@ -10,7 +10,7 @@
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "vitest",
     "run": "npx ts-node ./src/index.ts",
-    "build": "npx prisma:generate && npx prisma:migrate"
+    "build": "npm run prisma:generate && npm run prisma:migrate"
   },
   "keywords": [],
   "author": "",
