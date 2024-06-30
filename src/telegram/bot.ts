@@ -7,6 +7,7 @@ import { commandDescriptions } from '../app/literals/CommandDescriptions';
 import { LlmDialogController } from '../controllers/LlmDialogController';
 import { LlmDialogManager } from '../app/llm/conversation/LlmDialogManager';
 import { OpenAILlmProvider } from '../app/llm/providers/OpenAILlmProvider';
+import { Wendy } from '../app/llm/prompt/configs/Personas';
 
 const bot = new Telegraf(BOT_TOKEN!);
 const userRepository = new UserRepository();
@@ -22,30 +23,34 @@ const userRepository = new UserRepository();
     return new LlmDialogController(llmDialogManager);
   })();
 
+  const persona = new Wendy();
+
+
   bot.start(async (ctx) => {
     const userData = ctx.update.message.from;
     try {
+      const user = await userRepository.getById(userData.id);
+
+      // create or update user
       await userRepository.upsert({
         telegramFirstName: userData.first_name,
         telegramLastName: userData.last_name ?? '',
         telegramUserId: userData.id,
         telegramChatId: ctx.update.message.chat.id,
-        since: new Date(),
+        // preserving 'since'
+        since: user?.since ?? new Date(),
       });
+
+      await ctx.reply(commandDescriptions.successfulRegistration);
     } catch(error) {
       console.error(error);
+      await ctx.reply(commandDescriptions.somethingWentWrong);
     }
-    await ctx.reply(`Hello, ${userData.first_name}!`);
   });
 
   bot.help((ctx) => {
     // TODO: use LLM to craft the header
     ctx.reply(commandDescriptions.helpCommandDescription);
-  });
-
-  bot.command('register', (ctx) => {
-    const userId = ctx.from.id;
-
   });
 
   // bot.hears('hi', (ctx) => ctx.reply('Hey there'));
@@ -65,8 +70,22 @@ const userRepository = new UserRepository();
     } catch {}
   });
 
-  bot.on(message(), (ctx) => {
-    ctx.reply(`Вацок, ты че-то совсем не чувствуешь!`);
+  // general conversation
+  bot.on(message(), async (ctx) => {
+    try {
+      // TODO: testing cold start
+      const userId = ctx.from.id;
+
+      await ctx.sendChatAction('typing');
+
+      const assistantLlmMessage = await llmDialogController.converseCold({ userId, persona });
+
+      await ctx.reply(assistantLlmMessage.content);
+    }
+    catch (error) {
+      console.error(error);
+      await ctx.reply(commandDescriptions.somethingWentWrong);
+    }
   });
 
   bot.launch();
