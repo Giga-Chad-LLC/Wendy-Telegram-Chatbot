@@ -41,6 +41,7 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ./front-dist:/usr/share/nginx/html
+      - ./crt:/etc/ssl/
     restart: always
 
   bot:
