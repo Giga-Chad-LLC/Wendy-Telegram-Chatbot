@@ -1,2 +1,2 @@
-npm run prisma:generate
-npm run prisma:migrate
+#!/bin/bash
+npm run build
