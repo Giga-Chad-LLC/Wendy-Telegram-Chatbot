@@ -18,7 +18,7 @@ export class OpenAILlmProvider implements LlmProvider {
 
   // TODO: dynamically identify token limits based on model
   getTokenLimit(): number {
-    return 128_000;
+    return 64_000;
   }
 
   async sendMessage(message: string): Promise<string> {
