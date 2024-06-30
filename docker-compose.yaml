@@ -23,7 +23,6 @@ services:
       - api
 
   api:
-    image: wendy-bot
     build: .
     container_name: api
     env_file:
@@ -35,7 +34,6 @@ services:
       - postgres
 
   bot:
-    image: wendy-bot
     build: .
     container_name: bot
     env_file:
