@@ -11,7 +11,7 @@ install:
 
 .PHONY: compose
 compose:
-	docker-compose --env-file ./.env -f docker/docker-compose.yaml up -d
+	docker-compose --env-file ./.env -f docker-compose.yaml up -d
 
 
 .PHONY: run
