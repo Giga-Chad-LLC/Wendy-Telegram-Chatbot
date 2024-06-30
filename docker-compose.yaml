@@ -25,22 +25,20 @@ services:
   api:
     build: .
     container_name: api
-    tty: true
     env_file:
       - .env
     ports:
       - '3000:3000'
-    command: npm run build && npm run api
+    command: npm run api
     depends_on:
       - postgres
 
   bot:
     build: .
     container_name: bot
-    tty: true
     env_file:
       - .env
-    command: npm run build && npm run bot
+    command: npm run bot
     depends_on:
       - postgres
 
