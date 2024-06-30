@@ -25,6 +25,7 @@ services:
   api:
     build: .
     container_name: api
+    tty: true
     env_file:
       - .env
     ports:
@@ -36,6 +37,7 @@ services:
   bot:
     build: .
     container_name: bot
+    tty: true
     env_file:
       - .env
     command: npm run build && npm run bot
