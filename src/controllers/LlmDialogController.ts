@@ -21,6 +21,8 @@ import {
   ConversationContinuationParams,
   AbstractLlmDialogController, SaveMessageParams, SaveMessageInDatabaseParams,
 } from './AbstractLlmDialogController';
+import { ISymmetricEncryptor } from '../app/encription/ISymmetricEncryptor';
+import { EncryptedChatMessageRepository } from '../db/repositories/EncryptedChatMessageRepository';
 
 
 /**
@@ -37,11 +39,18 @@ export class LlmDialogController extends AbstractLlmDialogController {
   private readonly questionnaireRepository: QuestionnaireRepository;
 
 
-  constructor(llmDialogManager: LlmDialogManager) {
+  constructor(llmDialogManager: LlmDialogManager, encryptor?: ISymmetricEncryptor) {
     super();
     this.llmDialogManager = llmDialogManager;
 
-    this.chatMessageRepository = new ChatMessageRepository();
+    // if we have encryptor then use encrypted repository
+    if (encryptor) {
+      this.chatMessageRepository = new EncryptedChatMessageRepository(new ChatMessageRepository(), encryptor);
+    }
+    else {
+      this.chatMessageRepository = new ChatMessageRepository();
+    }
+
     this.questionnaireRepository = new QuestionnaireRepository();
 
     // history construction policy defines the algorithm according to which the llm chat history should be constructed

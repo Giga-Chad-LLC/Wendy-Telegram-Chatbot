@@ -1,5 +1,5 @@
 import { Telegraf } from 'telegraf';
-import { BOT_TOKEN, OPENAI_API_KEY } from '../../env';
+import { BOT_TOKEN, ENCRYPTION_KEY, OPENAI_API_KEY } from '../../env';
 import { message } from 'telegraf/filters';
 import { WebAppDataDto } from './WebAppData.dto';
 import { UserRepository } from '../db/repositories/UserRepository';
@@ -9,6 +9,7 @@ import { LlmDialogManager } from '../app/llm/conversation/LlmDialogManager';
 import { OpenAILlmProvider } from '../app/llm/providers/OpenAILlmProvider';
 import { Wendy } from '../app/llm/prompt/configs/Personas';
 import { QuestionnaireRepository } from '../db/repositories/QuestionnaireRepository';
+import { AESEncryptor } from '../app/encription/ISymmetricEncryptor';
 
 const bot = new Telegraf(BOT_TOKEN!);
 const userRepository = new UserRepository();
@@ -21,7 +22,13 @@ const userRepository = new UserRepository();
     });
     const llmDialogManager = new LlmDialogManager(llmProvider);
 
-    return new LlmDialogController(llmDialogManager);
+    if (ENCRYPTION_KEY) {
+      const encryptor = new AESEncryptor({ key: ENCRYPTION_KEY });
+      return new LlmDialogController(llmDialogManager, encryptor);
+    }
+    else {
+      return new LlmDialogController(llmDialogManager);
+    }
   })();
 
   const persona = new Wendy();
