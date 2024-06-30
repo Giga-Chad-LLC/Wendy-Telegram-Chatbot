@@ -1,4 +1,4 @@
-import { ChatMessageRole } from '@prisma/client';
+import { ChatMessage, ChatMessageRole } from '@prisma/client';
 import { ChatMessageRepository } from '../db/repositories/ChatMessageRepository';
 import { LlmDialogManager } from '../app/llm/conversation/LlmDialogManager';
 import { AssistantLlmChatMessage, SystemLlmChatMessage, UserLlmChatMessage } from '../app/llm/providers/LlmProvider';
@@ -23,6 +23,10 @@ export type ConversationContinuationParams = {
   persona: Persona;
 }
 
+export type SaveUserMessageParams = {
+  userId: number;
+  message: string;
+}
 
 /**
  * Acts as a facade over LLM and database related operations.
@@ -49,6 +53,24 @@ export class LlmDialogController {
       messagesSplitPolicy: new MessagesSplitByHalfPolicy(),
       chatMessageRepository: this.chatMessageRepository,
       llmDialogManager: this.llmDialogManager,
+    });
+  }
+
+  async saveUserMessage({ userId, message }: SaveUserMessageParams): Promise<ChatMessage> {
+    const now = new Date();
+
+    /**
+     * Time-consuming operation, as it prompts LLM
+     */
+    const summary = await this.llmDialogManager.summarizeMessage(message)
+
+    return await this.chatMessageRepository.create({
+      userId,
+      text: message,
+      summary: summary,
+      role: ChatMessageRole.USER,
+      sent: now,
+      lastEdited: now,
     });
   }
 
@@ -124,9 +146,14 @@ export class LlmDialogController {
       persona,
     });
 
-    console.log(`History Crafted: messages count: ${constructedHistory.messages.length}`)
-    console.log(`History's Initial System Prompt:\n"""${constructedHistory.initialSystemPrompt.content}\n"""`)
-    console.log(`User's Last Message:\n"""${constructedHistory.lastMessage.content}\n"""`)
+    // console.log(`History Crafted: messages count: ${constructedHistory.messages.length}`)
+    // console.log(`History's Initial System Prompt:\n"""${constructedHistory.initialSystemPrompt.content}\n"""`)
+    // console.log(`User's Last Message:\n"""${constructedHistory.lastMessage.content}\n"""`)
+    console.log(`
+================ Crafted History ================
+${constructedHistory.promptify()}
+=================================================
+    `.trim())
 
     // use current history to make conversation prompts
     const assistantLlmChatMessage = await this.llmDialogManager
@@ -135,8 +162,8 @@ export class LlmDialogController {
     const messageSummary = await this.llmDialogManager.summarizeMessage(assistantLlmChatMessage.content);
     const datePoint = new Date();
 
-    console.log(`LLM Response Message: "${assistantLlmChatMessage.content}"`);
-    console.log(`LLM Response Message (summarized): "${messageSummary}"`);
+    // console.log(`LLM Response Message: "${assistantLlmChatMessage.content}"`);
+    // console.log(`LLM Response Message (summarized): "${messageSummary}"`);
 
     // save assistant message in DB
     await this.chatMessageRepository.create({
