@@ -14,14 +14,6 @@ services:
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
 
-  front:
-    image: wendy-front
-    container_name: front
-    ports:
-      - '80:80'
-    depends_on:
-      - api
-
   api:
     build: .
     container_name: api
@@ -31,8 +23,19 @@ services:
       - '3000:3000'
     command: /bin/sh -c "npm run build && npm run api"
     tty: true
+    restart: always
     depends_on:
       - postgres
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./front-dist:/usr/share/nginx/html
+    restart: always
 
   bot:
     build: .
@@ -40,6 +43,7 @@ services:
     env_file:
       - .env
     command: /bin/sh -c "npm run build && npm run bot"
+    restart: always
     tty: true
     depends_on:
       - postgres
