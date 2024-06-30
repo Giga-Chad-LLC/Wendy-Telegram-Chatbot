@@ -1,7 +1,12 @@
 import { ChatMessage, ChatMessageRole } from '@prisma/client';
 import { ChatMessageRepository } from '../db/repositories/ChatMessageRepository';
 import { LlmDialogManager } from '../app/llm/conversation/LlmDialogManager';
-import { AssistantLlmChatMessage, SystemLlmChatMessage, UserLlmChatMessage } from '../app/llm/providers/LlmProvider';
+import {
+  AssistantLlmChatMessage,
+  LlmChatMessageRole,
+  SystemLlmChatMessage,
+  UserLlmChatMessage,
+} from '../app/llm/providers/LlmProvider';
 import { QuestionnaireRepository } from '../db/repositories/QuestionnaireRepository';
 import { QuestionnaireModel } from '../db/models/QuestionnaireModel';
 import { Persona } from '../app/llm/prompt/configs/Personas';
@@ -11,29 +16,21 @@ import {
   IHistoryConstructionPolicy,
   TwoMessageHistoryConstructionPolicy,
 } from '../app/llm/conversation/policies/IHistoryConstructionPolicies';
+import {
+  ColdConversationStartParams,
+  ConversationContinuationParams,
+  AbstractLlmDialogController, SaveMessageParams, SaveMessageInDatabaseParams,
+} from './AbstractLlmDialogController';
+import { ISymmetricEncryptor } from '../app/encription/ISymmetricEncryptor';
+import { EncryptedChatMessageRepository } from '../db/repositories/EncryptedChatMessageRepository';
 
-export type ColdConversationStartParams = {
-  userId: number;
-  persona: Persona;
-};
-
-export type ConversationContinuationParams = {
-  lastUserMessageContent: string;
-  userId: number;
-  persona: Persona;
-}
-
-export type SaveUserMessageParams = {
-  userId: number;
-  message: string;
-}
 
 /**
  * Acts as a facade over LLM and database related operations.
  * <\br>
  * User this class to effectively conduct communication with an LLM and store its responses into the database.
  */
-export class LlmDialogController {
+export class LlmDialogController extends AbstractLlmDialogController {
   private readonly llmDialogManager: LlmDialogManager;
   private readonly historyConstructionPolicy: IHistoryConstructionPolicy;
 
@@ -42,10 +39,18 @@ export class LlmDialogController {
   private readonly questionnaireRepository: QuestionnaireRepository;
 
 
-  constructor(llmDialogManager: LlmDialogManager) {
+  constructor(llmDialogManager: LlmDialogManager, encryptor?: ISymmetricEncryptor) {
+    super();
     this.llmDialogManager = llmDialogManager;
 
-    this.chatMessageRepository = new ChatMessageRepository();
+    // if we have encryptor then use encrypted repository
+    if (encryptor) {
+      this.chatMessageRepository = new EncryptedChatMessageRepository(new ChatMessageRepository(), encryptor);
+    }
+    else {
+      this.chatMessageRepository = new ChatMessageRepository();
+    }
+
     this.questionnaireRepository = new QuestionnaireRepository();
 
     // history construction policy defines the algorithm according to which the llm chat history should be constructed
@@ -56,22 +61,48 @@ export class LlmDialogController {
     });
   }
 
-  async saveUserMessage({ userId, message }: SaveUserMessageParams): Promise<ChatMessage> {
+  async saveMessageInDatabase({ userId, message, summary, role }: SaveMessageInDatabaseParams): Promise<ChatMessage> {
     const now = new Date();
-
-    /**
-     * Time-consuming operation, as it prompts LLM
-     */
-    const summary = await this.llmDialogManager.summarizeMessage(message)
-
     return await this.chatMessageRepository.create({
       userId,
       text: message,
       summary: summary,
-      role: ChatMessageRole.USER,
+      role,
       sent: now,
       lastEdited: now,
     });
+  }
+
+  async saveUserMessage({ userId, message }: SaveMessageParams): Promise<ChatMessage> {
+    // create summary of the message
+    const summary = await this.summarizeMessage(message);
+
+    return await this.saveMessageInDatabase({
+      userId,
+      message,
+      summary,
+      role: ChatMessageRole.USER,
+    });
+  }
+
+  async saveAssistantMessage({ userId, message }: SaveMessageParams): Promise<ChatMessage> {
+    // create summary of the message
+    const summary = await this.summarizeMessage(message);
+
+    return await this.saveMessageInDatabase({
+      userId,
+      message,
+      summary,
+      role: ChatMessageRole.ASSISTANT,
+    });
+  }
+
+  /**
+   * Prompts LLM to create a summary of a message (time-consuming operation).
+   * Can be decorated to apply encryption.
+   */
+  async summarizeMessage(message: string): Promise<string> {
+    return await this.llmDialogManager.summarizeMessage(message);
   }
 
   /**
@@ -102,18 +133,8 @@ export class LlmDialogController {
         persona,
       });
 
-    const messageSummary = await this.llmDialogManager.summarizeMessage(assistantLlmChatMessage.content);
-    const datePoint = new Date();
-
     // save assistant message in the database
-    await this.chatMessageRepository.create({
-      userId,
-      text: assistantLlmChatMessage.content,
-      summary: messageSummary,
-      role: ChatMessageRole.ASSISTANT,
-      sent: datePoint,
-      lastEdited: datePoint,
-    });
+    await this.saveAssistantMessage({ userId, message: assistantLlmChatMessage.content });
 
     return new Promise<AssistantLlmChatMessage>((resolve, _) => resolve(assistantLlmChatMessage));
   }
@@ -159,21 +180,8 @@ ${constructedHistory.promptify()}
     const assistantLlmChatMessage = await this.llmDialogManager
       .converse({ history: constructedHistory });
 
-    const messageSummary = await this.llmDialogManager.summarizeMessage(assistantLlmChatMessage.content);
-    const datePoint = new Date();
-
-    // console.log(`LLM Response Message: "${assistantLlmChatMessage.content}"`);
-    // console.log(`LLM Response Message (summarized): "${messageSummary}"`);
-
     // save assistant message in DB
-    await this.chatMessageRepository.create({
-      userId,
-      text: assistantLlmChatMessage.content,
-      summary: messageSummary,
-      role: ChatMessageRole.ASSISTANT,
-      sent: datePoint,
-      lastEdited: datePoint,
-    });
+    await this.saveAssistantMessage({ userId, message: assistantLlmChatMessage.content });
 
     return new Promise<AssistantLlmChatMessage>((resolve, _) => resolve(assistantLlmChatMessage));
   }
