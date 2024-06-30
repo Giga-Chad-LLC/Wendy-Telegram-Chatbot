@@ -1,32 +1,25 @@
 import { IPromptifiable } from '../../app/actions/IPromptifiable';
 import { Questionnaire } from '@prisma/client';
 
-export type QuestionnaireModelDto = {
+
+export class QuestionnaireModel implements IPromptifiable {
   readonly userId: number;
   readonly preferredName: string;
   readonly isAdult: boolean;
-  readonly age: number | null;
+  /**
+   * User's birthday date
+   */
+  readonly bday: Date;
   readonly residenceCountry: string;
-  readonly residenceCity: string | null;
   readonly bio: string;
-}
-
-
-export class QuestionnaireModel implements IPromptifiable {
-  readonly id: number;
-  dto: QuestionnaireModelDto;
 
   constructor(questionnaire: Questionnaire) {
-    this.id = questionnaire.id;
-    this.dto = {
-      userId: questionnaire.userId,
-      preferredName: questionnaire.preferredName,
-      isAdult: questionnaire.isAdult,
-      age: questionnaire.age,
-      residenceCountry: questionnaire.residenceCountry,
-      residenceCity: questionnaire.residenceCity,
-      bio: questionnaire.bio,
-    };
+    this.userId = questionnaire.userId;
+    this.preferredName = questionnaire.preferredName;
+    this.isAdult = questionnaire.isAdult;
+    this.bday = questionnaire.bday;
+    this.residenceCountry = questionnaire.residenceCountry;
+    this.bio = questionnaire.bio;
   }
 
   /**
@@ -35,12 +28,23 @@ export class QuestionnaireModel implements IPromptifiable {
    * @return formatted string representation of the questionnaire
    */
   promptify(): string {
-    return `Preferred Name: ${this.dto.preferredName}
-Maturity: ${this.dto.isAdult ? 'Adult' : 'Minor'}
-${this.dto.age ? `Age: ${this.dto.age}` : ''}
-Country of residence: ${this.dto.residenceCountry}
-${this.dto.residenceCity ? `City of residence: ${this.dto.residenceCity}` : ''}
-Bio sent by ${this.dto.preferredName} when you first met:
-"${this.dto.bio}"`
+    const age = this.getAge();
+
+    return `Preferred Name: ${this.preferredName}
+Maturity: ${this.isAdult ? 'Adult' : 'Minor'}
+${age ? `Age: ${age}` : ''}
+Country of residence: ${this.residenceCountry}
+Bio sent by ${this.preferredName} when you first met:
+"${this.bio}"`
+  }
+
+  private getAge(): number | null {
+    const diff = Date.now() - this.bday.getTime();
+    if (diff < 0) {
+      return null;
+    }
+    else {
+      return new Date(diff).getUTCFullYear() - 1970;
+    }
   }
 }

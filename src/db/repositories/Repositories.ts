@@ -1,8 +1,12 @@
 
 // TODO: where to prisma.$disconnect()?
 export interface IRepository<T> {
-  create(data: Omit<T, 'id'>): Promise<T>;
-  update(id: number, data: Partial<T>): Promise<T>;
+  create(data: Omit<T, 'id'> | T): Promise<T>;
+  update(id: number, data: Partial<T> | T): Promise<T>;
+}
+
+export interface IUpsertableRepository<T> {
+  upsert(data: T | Omit<T, 'id'>): Promise<T>;
 }
 
 export interface IDeletableRepository<T> {
