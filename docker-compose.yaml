@@ -14,6 +14,14 @@ services:
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
 
+  front:
+    image: wendy-front
+    container_name: front
+    ports:
+      - '80:80'
+    depends_on:
+      - api
+
   api:
     image: wendy-bot
     build: .
