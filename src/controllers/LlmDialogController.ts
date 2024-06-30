@@ -19,7 +19,7 @@ import {
 import {
   ColdConversationStartParams,
   ConversationContinuationParams,
-  AbstractLlmDialogController, SaveMessageParams, SaveMessageWithRoleParams,
+  AbstractLlmDialogController, SaveMessageParams, SaveMessageInDatabaseParams,
 } from './AbstractLlmDialogController';
 
 
@@ -52,11 +52,8 @@ export class LlmDialogController extends AbstractLlmDialogController {
     });
   }
 
-
-  async saveMessage({ userId, message, role }: SaveMessageWithRoleParams): Promise<ChatMessage> {
+  async saveMessageInDatabase({ userId, message, summary, role }: SaveMessageInDatabaseParams): Promise<ChatMessage> {
     const now = new Date();
-    const summary = await this.summarizeMessage(message);
-
     return await this.chatMessageRepository.create({
       userId,
       text: message,
@@ -68,22 +65,27 @@ export class LlmDialogController extends AbstractLlmDialogController {
   }
 
   async saveUserMessage({ userId, message }: SaveMessageParams): Promise<ChatMessage> {
-    return await this.saveMessage({ userId, message, role: ChatMessageRole.USER });
-    /*const now = new Date();
+    // create summary of the message
     const summary = await this.summarizeMessage(message);
 
-    return await this.chatMessageRepository.create({
+    return await this.saveMessageInDatabase({
       userId,
-      text: message,
-      summary: summary,
+      message,
+      summary,
       role: ChatMessageRole.USER,
-      sent: now,
-      lastEdited: now,
-    });*/
+    });
   }
 
   async saveAssistantMessage({ userId, message }: SaveMessageParams): Promise<ChatMessage> {
-    return await this.saveMessage({ userId, message, role: ChatMessageRole.ASSISTANT });
+    // create summary of the message
+    const summary = await this.summarizeMessage(message);
+
+    return await this.saveMessageInDatabase({
+      userId,
+      message,
+      summary,
+      role: ChatMessageRole.ASSISTANT,
+    });
   }
 
   /**
@@ -124,18 +126,6 @@ export class LlmDialogController extends AbstractLlmDialogController {
 
     // save assistant message in the database
     await this.saveAssistantMessage({ userId, message: assistantLlmChatMessage.content });
-    /*
-    const messageSummary = await this.summarizeMessage(assistantLlmChatMessage.content);
-    const datePoint = new Date();
-
-    await this.chatMessageRepository.create({
-      userId,
-      text: assistantLlmChatMessage.content,
-      summary: messageSummary,
-      role: ChatMessageRole.ASSISTANT,
-      sent: datePoint,
-      lastEdited: datePoint,
-    });*/
 
     return new Promise<AssistantLlmChatMessage>((resolve, _) => resolve(assistantLlmChatMessage));
   }
@@ -183,20 +173,6 @@ ${constructedHistory.promptify()}
 
     // save assistant message in DB
     await this.saveAssistantMessage({ userId, message: assistantLlmChatMessage.content });
-    /*const messageSummary = await this.summarizeMessage(assistantLlmChatMessage.content);
-    const datePoint = new Date();
-
-    // console.log(`LLM Response Message: "${assistantLlmChatMessage.content}"`);
-    // console.log(`LLM Response Message (summarized): "${messageSummary}"`);
-
-    await this.chatMessageRepository.create({
-      userId,
-      text: assistantLlmChatMessage.content,
-      summary: messageSummary,
-      role: ChatMessageRole.ASSISTANT,
-      sent: datePoint,
-      lastEdited: datePoint,
-    });*/
 
     return new Promise<AssistantLlmChatMessage>((resolve, _) => resolve(assistantLlmChatMessage));
   }

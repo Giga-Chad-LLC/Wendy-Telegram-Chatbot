@@ -18,19 +18,20 @@ export type SaveMessageParams = {
   message: string;
 }
 
-export type SaveMessageWithRoleParams = {
+export type SaveMessageInDatabaseParams = {
   userId: number;
   message: string;
+  summary: string;
   role: ChatMessageRole,
 }
 
 export abstract class AbstractLlmDialogController {
-  abstract saveMessage({ userId, message, role }: SaveMessageWithRoleParams): Promise<ChatMessage>;
-  abstract saveUserMessage({ userId, message }: SaveMessageParams): Promise<ChatMessage>;
-  abstract saveAssistantMessage({ userId, message }: SaveMessageParams): Promise<ChatMessage>;
+  abstract saveMessageInDatabase(params: SaveMessageInDatabaseParams): Promise<ChatMessage>;
+  abstract saveUserMessage(params: SaveMessageParams): Promise<ChatMessage>;
+  abstract saveAssistantMessage(params: SaveMessageParams): Promise<ChatMessage>;
 
   abstract summarizeMessage(message: string): Promise<string>;
-  abstract converseCold({ userId, persona }: ColdConversationStartParams): Promise<AssistantLlmChatMessage>;
-  abstract converse({ lastUserMessageContent, userId, persona }: ConversationContinuationParams): Promise<AssistantLlmChatMessage>
+  abstract converseCold(params: ColdConversationStartParams): Promise<AssistantLlmChatMessage>;
+  abstract converse(params: ConversationContinuationParams): Promise<AssistantLlmChatMessage>
 }
 

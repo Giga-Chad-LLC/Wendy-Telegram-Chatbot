@@ -1,7 +1,7 @@
 import {
   ColdConversationStartParams,
   ConversationContinuationParams,
-  AbstractLlmDialogController, SaveMessageParams, SaveMessageWithRoleParams,
+  AbstractLlmDialogController, SaveMessageParams, SaveMessageInDatabaseParams,
 } from './AbstractLlmDialogController';
 import { AssistantLlmChatMessage } from '../app/llm/providers/LlmProvider';
 import { ChatMessage } from '@prisma/client';
@@ -26,25 +26,24 @@ export class LlmDialogControllerEncryptionDecorator extends AbstractLlmDialogCon
     return this.controller.converseCold(params);
   }
 
-  // const cipheredMessage = this.encryptor.encrypt(message);
+  async summarizeMessage(message: string): Promise<string> {
+    const summary = await this.controller.summarizeMessage(message);
+    return this.encryptor.encrypt(summary);
+  }
+
+  saveMessageInDatabase({ message, ...rest }: SaveMessageInDatabaseParams): Promise<ChatMessage> {
+    const cipheredMessage = this.encryptor.encrypt(message);
+    return this.controller.saveMessageInDatabase({
+      message: cipheredMessage,
+      ...rest,
+    });
+  }
+
   async saveUserMessage(params: SaveMessageParams): Promise<ChatMessage> {
     return this.controller.saveUserMessage(params);
   }
 
   saveAssistantMessage(params: SaveMessageParams): Promise<ChatMessage> {
     return this.controller.saveAssistantMessage(params);
-  }
-
-  saveMessage({ message, ...rest }: SaveMessageWithRoleParams): Promise<ChatMessage> {
-    const cipheredMessage = this.encryptor.encrypt(message);
-    return this.controller.saveMessage({
-      message: cipheredMessage,
-      ...rest,
-    });
-  }
-
-  async summarizeMessage(message: string): Promise<string> {
-    const summary = await this.controller.summarizeMessage(message);
-    return this.encryptor.encrypt(summary);
   }
 }
