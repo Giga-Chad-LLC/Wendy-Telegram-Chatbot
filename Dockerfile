@@ -7,6 +7,4 @@ RUN npm i
 
 COPY . .
 
-RUN chmod +x ./entrypoint.sh
-
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["/bin/sh", "-c"]
