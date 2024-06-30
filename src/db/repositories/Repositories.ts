@@ -5,6 +5,10 @@ export interface IRepository<T> {
   update(id: number, data: Partial<T> | T): Promise<T>;
 }
 
+export interface IUpsertableRepository<T> {
+  upsert(data: T | Omit<T, 'id'>): Promise<T>;
+}
+
 export interface IDeletableRepository<T> {
   delete(id: number): Promise<T | null>;
 }

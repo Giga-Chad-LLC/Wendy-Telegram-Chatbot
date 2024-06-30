@@ -3,7 +3,7 @@ import { User } from '@prisma/client';
 export type UserModelDto = {
   readonly telegramFirstName: string;
   readonly telegramLastName: string;
-  readonly telegramUserId: string;
+  readonly telegramUserId: number;
   readonly telegramChatId: number;
   readonly since: Date;
 }

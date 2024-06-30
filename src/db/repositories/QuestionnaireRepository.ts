@@ -1,17 +1,16 @@
 import {
-  IByUserIdUniqueRetrievableRepository,
-  IRepository,
+  IByUserIdUniqueRetrievableRepository, IUpsertableRepository,
 } from './Repositories';
 import { PrismaClient, Questionnaire } from '@prisma/client';
 
 export class QuestionnaireRepository
   implements
-    IRepository<Questionnaire>,
+    IUpsertableRepository<Questionnaire>,
     IByUserIdUniqueRetrievableRepository<Questionnaire>
 {
   private readonly prisma = new PrismaClient();
 
-  create(data: Questionnaire): Promise<Questionnaire> {
+  /*create(data: Questionnaire): Promise<Questionnaire> {
     return this.prisma.questionnaire.create({ data });
   }
 
@@ -20,7 +19,7 @@ export class QuestionnaireRepository
       where: { userId: id },
       data,
     });
-  }
+  }*/
 
   upsert(data: Questionnaire): Promise<Questionnaire> {
     return this.prisma.questionnaire.upsert({

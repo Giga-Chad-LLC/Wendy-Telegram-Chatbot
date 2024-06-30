@@ -53,7 +53,7 @@ export class LlmDialogManager {
         .set(PromptTemplateVariables.INSTRUCTION, ConverseWithPartnerAccordingToPersonaInstruction.instruction)
         .set(PromptTemplateVariables.QUESTIONNAIRE, questionnaire.promptify())
         .set(PromptTemplateVariables.CONVERSATION_EXAMPLE, conversationExample)
-        .set(PromptTemplateVariables.USER_NAME, questionnaire.dto.preferredName)
+        .set(PromptTemplateVariables.USER_NAME, questionnaire.preferredName)
         .build();
 
       // contains answer of persona that should be sent in user's chat
@@ -74,7 +74,7 @@ export class LlmDialogManager {
         .set(PromptTemplateVariables.PERSONA_DESCRIPTION, persona.description)
         .set(PromptTemplateVariables.INSTRUCTION, BuildExampleConversationInstruction.instruction)
         .set(PromptTemplateVariables.QUESTIONNAIRE, questionnaire.promptify())
-        .set(PromptTemplateVariables.USER_NAME, questionnaire.dto.preferredName)
+        .set(PromptTemplateVariables.USER_NAME, questionnaire.preferredName)
         .set(PromptTemplateVariables.OUTPUT_FORMAT, BuildExampleConversationInstruction.outputFormat)
         .build();
 
@@ -166,7 +166,7 @@ export class LlmDialogManager {
       .set(PromptTemplateVariables.SUMMARIZED_MESSAGES, summarizedMessagesComponent)
       .set(PromptTemplateVariables.CONVERSATION_MESSAGES, recentMessagesComponent)
       .set(PromptTemplateVariables.LAST_CHAT_MESSAGE, lastUserMessage)
-      .set(PromptTemplateVariables.USER_NAME, questionnaire.dto.preferredName)
+      .set(PromptTemplateVariables.USER_NAME, questionnaire.preferredName)
       .build();
   }
 
