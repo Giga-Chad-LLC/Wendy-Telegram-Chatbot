@@ -12,7 +12,8 @@ How to start interaction:
 To start the open interaction with Wendy You need to fill out a questionnaire about yourself and submit it. Press the blue button in the bottom left corner near the message input field.
     `.trim(),
 
-  somethingWentWrong: 'I am afraid something went wrong... Try a bit later!',
-
-  successfulRegistration: `You are successfully registered! Please, write /help to see the next step.`
+  somethingWentWrong: "I am afraid something went wrong... Try a bit later!",
+  successfulRegistration: "You are successfully registered! Please, write /help to see the next step.",
+  alreadyRegistered: "You are already registered. No operation performed.",
+  fillOutQuestionnaireFirst: "You should fill out the questionnaire first. Use /help if you need assistance."
 }
