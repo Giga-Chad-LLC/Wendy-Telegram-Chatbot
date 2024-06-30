@@ -45,7 +45,7 @@ export class LlmDialogManager {
   }: ColdConversationParams): Promise<AssistantLlmChatMessage> {
     try {
       const conversationExample = await this.createAuxiliaryConversationExample(questionnaire, persona);
-      console.log(`=============== conversationExample ===============\n${conversationExample}`)
+      // console.log(`=============== conversationExample ===============\n${conversationExample}`)
 
       const initialInstructionPrompt = new PromptTemplate(promptTemplates.coldConversationStartInstructionPromptTemplate)
         .set(PromptTemplateVariables.PERSONA_DESCRIPTION, persona.description)
@@ -130,7 +130,7 @@ export class LlmDialogManager {
         .build();
 
       const summary = await this.llmProvider.sendMessage(constructSummaryInstructionPrompt);
-      console.log(`Message Summary:\n'''\n${summary}\n'''`);
+      // console.log(`Message Summary:\n'''\n${summary}\n'''`);
 
       return new Promise<string>((resolve, _) => resolve(summary));
     }
@@ -150,11 +150,11 @@ export class LlmDialogManager {
     lastUserMessage,
     persona,
   }: CreateGeneralDialogInstructionPromptParams): string {
-    const summarizedMessagesComponent = messagesToSummarize
+    const summarizedMessagesComponent = (messagesToSummarize.length <= 0) ? "[NO SUMMARY YET]" : messagesToSummarize
       .map(msg => msg.promptifyAsSummary())
       .join('\n\n');
 
-    const recentMessagesComponent = recentMessages
+    const recentMessagesComponent = (messagesToSummarize.length <= 0) ? "[NO RECENT MESSAGES YET]" : recentMessages
       .map(msg => msg.promptify())
       .join('\n\n');
 
