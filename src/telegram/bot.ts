@@ -8,6 +8,7 @@ import { LlmDialogController } from '../controllers/LlmDialogController';
 import { LlmDialogManager } from '../app/llm/conversation/LlmDialogManager';
 import { OpenAILlmProvider } from '../app/llm/providers/OpenAILlmProvider';
 import { Wendy } from '../app/llm/prompt/configs/Personas';
+import { QuestionnaireRepository } from '../db/repositories/QuestionnaireRepository';
 
 const bot = new Telegraf(BOT_TOKEN!);
 const userRepository = new UserRepository();
@@ -41,7 +42,12 @@ const userRepository = new UserRepository();
         since: user?.since ?? new Date(),
       });
 
-      await ctx.reply(commandDescriptions.successfulRegistration);
+      if (!user) {
+        await ctx.reply(commandDescriptions.successfulRegistration);
+      }
+      else {
+        await ctx.reply(commandDescriptions.alreadyRegistered);
+      }
     } catch(error) {
       console.error(error);
       await ctx.reply(commandDescriptions.somethingWentWrong);
@@ -71,14 +77,37 @@ const userRepository = new UserRepository();
   });
 
   // general conversation
-  bot.on(message(), async (ctx) => {
+  // TODO: deprecated, user another API
+  bot.on('text', async (ctx) => {
     try {
-      // TODO: testing cold start
       const userId = ctx.from.id;
+      const message: string = ctx.message.text;
 
+      // TODO: move to method
+      // check existence of user's questionnaire
+      const questionnaireRepository = new QuestionnaireRepository()
+      const questionnaire = await questionnaireRepository.getByUserId(userId);
+
+      if (!questionnaire) {
+        await ctx.reply(commandDescriptions.fillOutQuestionnaireFirst);
+        return;
+      }
+
+      // start typing
       await ctx.sendChatAction('typing');
 
-      const assistantLlmMessage = await llmDialogController.converseCold({ userId, persona });
+      // saving user message to database
+      await llmDialogController.saveUserMessage({ userId, message });
+
+      // start typing if the previous stopped by timeout
+      await ctx.sendChatAction('typing');
+
+      const assistantLlmMessage = await llmDialogController
+        .converse({
+          userId,
+          lastUserMessageContent: message,
+          persona,
+        });
 
       await ctx.reply(assistantLlmMessage.content);
     }
