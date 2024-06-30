@@ -1,4 +1,5 @@
 import { LlmChatMessage, SystemLlmChatMessage } from '../providers/LlmProvider';
+import { IPromptifiable } from '../../actions/IPromptifiable';
 
 
 
@@ -9,7 +10,7 @@ export type LlmChatHistoryParams = {
 }
 
 
-export class LlmChatHistory {
+export class LlmChatHistory implements IPromptifiable {
   readonly messages: LlmChatMessage[];
   readonly initialSystemPrompt: SystemLlmChatMessage;
   readonly lastMessage: LlmChatMessage; // TODO: getter?
@@ -23,5 +24,15 @@ export class LlmChatHistory {
     this.messages = messages;
     this.initialSystemPrompt = initialSystemPrompt;
     this.lastMessage = lastMessage;
+  }
+
+  promptify(): string {
+    return `
+#### System Prompt
+${this.initialSystemPrompt.content}
+
+#### Messages:
+${this.messages.map(m => `[${m.role}]: "${m.content}"`).join('\n')}
+    `.trim();
   }
 }
