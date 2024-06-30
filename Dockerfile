@@ -6,7 +6,3 @@ RUN apt-get update -y && apt-get install -y openssl
 RUN npm i
 
 COPY . .
-
-RUN chmod +x ./entrypoint.sh
-
-ENTRYPOINT ["./entrypoint.sh"]
