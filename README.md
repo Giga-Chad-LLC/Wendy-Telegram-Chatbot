@@ -1,4 +1,4 @@
-# Wendy | The Telegram Chatbot
+# Wendy | Mental Health AI Telegram Chatbot
 
 ![Header](./assets/readme/header.png)
 
