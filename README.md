@@ -2,8 +2,6 @@
 
 ![Header](./assets/readme/header.png)
 
----
-
 ## 🤝 Participants
 
 ---
