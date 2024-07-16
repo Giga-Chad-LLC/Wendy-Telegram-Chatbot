@@ -15,7 +15,7 @@
 
 ---
 
-### 🥇 The solution has won the hackathon!!! 🥇
+### 🥇 The solution has won the ["AI-Powered Mental Wellness Support Chatbot"](https://hackformental.com/) hackathon!!! 🥇
 
 The project succeeded in securing **4/9 nominations**:
 
