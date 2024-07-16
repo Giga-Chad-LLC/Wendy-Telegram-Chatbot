@@ -51,7 +51,7 @@ In case of emotional deprivation, AI may suggest the contacts of **local mental 
 
 **Start of the conversation:**
 
-_Cold conversation start_ feature is turned off, as it requires a filled out questionnaire and a server hosted on a publicly available API (as far as we know, it is a limitation of the Telegram webapps): 
+_Cold conversation start_ feature is turned off, as it requires a filled out questionnaire and a server hosted on a publicly available server (as far as we know, it is a limitation of the Telegram webapps): 
 
 <img alt="" src="./assets/readme/demos/start.gif" />
 <div style="margin-top:30px;"></div>
