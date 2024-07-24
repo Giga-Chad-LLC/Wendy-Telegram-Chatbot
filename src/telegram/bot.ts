@@ -39,6 +39,8 @@ const userRepository = new UserRepository();
     try {
       const user = await userRepository.getById(userData.id);
 
+      console.log(user);
+
       // create or update user
       await userRepository.upsert({
         telegramFirstName: userData.first_name,
@@ -81,6 +83,27 @@ const userRepository = new UserRepository();
         }
       }
     } catch {}
+  });
+
+  bot.command('cold-start-test', async (ctx) => {
+    try {
+      // testing cold conversation start
+      const userId = ctx.from.id;
+
+      // start typing
+      await ctx.sendChatAction('typing');
+
+      // msg already saved into db
+      const assistantMessage = await llmDialogController.converseCold({ userId, persona });
+
+      await ctx.sendChatAction('typing');
+
+      await ctx.reply(assistantMessage.content);
+    }
+    catch (error) {
+      console.error(error);
+      await ctx.reply(commandDescriptions.somethingWentWrong);
+    }
   });
 
   // general conversation
