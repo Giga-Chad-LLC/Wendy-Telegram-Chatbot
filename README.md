@@ -46,7 +46,7 @@ In case of emotional deprivation, AI may suggest the contacts of **local mental 
 
 1. **Presentation Defense**: [link](https://www.youtube.com/watch?v=UXNR1TSjhJw&t=179s&ab_channel=VladislavArtiukhov).
 2. **Demo for Hackathon**: [link](https://www.youtube.com/watch?v=9Mh6I-XeOs8&t=2s&ab_channel=VladislavArtiukhov).
-3. **Extended Demo**: [link](https://www.youtube.com/watch?v=xx4KD5zgnsA&t=4s&ab_channel=VladislavArtiukhov).
+3. **Extended Demo (a real prolonged conversation)**: [link](https://www.youtube.com/watch?v=xx4KD5zgnsA&t=4s&ab_channel=VladislavArtiukhov).
 4. **Live stream with Nominations & winner selection**: [link](https://raptors.wistia.com/medias/8al3d25uv2).
 
 **Start of the conversation:**
