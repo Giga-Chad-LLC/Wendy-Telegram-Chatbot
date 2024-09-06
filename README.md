@@ -24,6 +24,7 @@ The project succeeded in securing **4/9 nominations**:
 🔒 **Security and Privacy Assurance**</br>
 🏗️ **Architecture Scalability**
 
+**We got published on the hackathon's [winners page](https://hackformental.com/winners)!**
 
 ## 🌟 Idea
 
