@@ -54,7 +54,7 @@ In case of emotional deprivation, AI may suggest the contacts of **local mental 
 
 _Cold conversation start_ feature is turned off, as it requires a filled out questionnaire and a server hosted on a publicly available server (as far as we know, it is a limitation of the Telegram webapps): 
 
-<img alt="" src="./assets/readme/demos/start.gif" />
+<img alt="" src="./assets/readme/demos/harry-potter.gif" />
 <div style="margin-top:30px;"></div>
 
 
@@ -63,7 +63,7 @@ _Cold conversation start_ feature is turned off, as it requires a filled out que
 
 The prompt contained information that Wendy loves reading fantasy books, such as "Harry Potter" and "Lord of the Rings".
 
-<img alt="" src="./assets/readme/demos/start.gif" />
+<img alt="" src="./assets/readme/demos/harry-potter.gif" />
 <div style="margin-top:30px;"></div>
 
 
@@ -73,7 +73,7 @@ The prompt contained information that Wendy loves reading fantasy books, such as
 **To our surprise, the LLM created and developed the narrative that was not inserted in the prompt**:
 Wendy previously had intimate relationship with a guy named Alex. They broke up because of having too little time to spend together.  
 
-<img alt="" src="./assets/readme/demos/start.gif" />
+<img alt="" src="./assets/readme/demos/relationship.gif" />
 
 
 ---
